@@ -10,6 +10,7 @@ interface ParsedMessage {
 	login: string;
 	bestName: string;
 	message: string;
+	isAction: boolean;
 	color?: string;
 	badges: TwitchBadge[];
 	roles: string[];
@@ -39,7 +40,14 @@ class Parser {
 			const messageMatch = rawMessage.match(/PRIVMSG #[^ ]+ ?:?(.*)$/);
 
 			if (!messageMatch) return null;
-			const messageContent = messageMatch[1].trim();
+			let messageContent = messageMatch[1].trim();
+
+			const isAction =
+				messageContent.startsWith('\u0001ACTION ') && messageContent.endsWith('\u0001');
+
+			if (isAction) {
+				messageContent = messageContent.slice(8, -1).trim();
+			}
 
 			const tags = this.parseTags(tagsPart);
 			const displayName = tags.get('display-name') || login;
@@ -51,6 +59,7 @@ class Parser {
 				login,
 				bestName: displayName?.toLowerCase() === login ? displayName : `${displayName} (${login})`,
 				message: messageContent,
+				isAction,
 				color: tags.get('color') || this.fallbackColor,
 				badges: this.parseBadges(tags.get('badges') || ''),
 				roles: this.parseRoles(tags),

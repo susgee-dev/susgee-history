@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface TwitchBadge {
 	type: string;
@@ -14,6 +15,7 @@ interface ParsedMessage {
 	login: string;
 	bestName: string;
 	message: string;
+	isAction: boolean;
 	color?: string;
 	badges: TwitchBadge[];
 	roles: string[];
@@ -42,16 +44,24 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 					const url = badges[key] ?? badges[badge.version ?? ''];
 
 					return url ? (
-						<img key={key} alt={badge.type} className="h-4 w-4" src={url} title={badge.type} />
+						<Image key={key} alt={badge.type} height={16} src={url} title={badge.type} width={16} />
 					) : null;
 				})}
 
-				<span className="text-lg font-semibold" style={{ color: message.color || '#aaa' }}>
-					{message.bestName}:
+				<span className="text-lg font-semibold" style={{ color: message.color }}>
+					{message.bestName}
+					{!message.isAction && ':'}
 				</span>
 			</div>
 
-			<div className="break-words text-lg">{message.message}</div>
+			<div
+				className="break-words text-lg"
+				style={{
+					color: message.isAction ? message.color : undefined
+				}}
+			>
+				{message.message}
+			</div>
 		</motion.div>
 	);
 }

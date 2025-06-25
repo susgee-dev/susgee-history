@@ -68,7 +68,7 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
 
 		parsed = messages
 			?.map((msg: string) => parser.process(msg))
-			?.filter(Boolean)
+			?.filter((msg): msg is ParsedMessage => !!msg)
 			.reverse();
 
 		badges = {

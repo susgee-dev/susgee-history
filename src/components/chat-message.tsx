@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -30,37 +29,34 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 	};
 
 	return (
-		<motion.div
-			animate={{ opacity: 1, y: 0 }}
-			className="flex w-full items-start gap-2 py-0.5"
-			initial={{ opacity: 0, y: 4 }}
-			transition={{ duration: 0.2 }}
-		>
-			<div className="flex shrink-0 items-center gap-1">
-				<span className="mr-1 text-lg text-muted-foreground">{formatTime(message.timestamp)}</span>
-				{message.badges.map((badge) => {
-					const key = `${badge.type}_${badge.version}`;
-					const url = badges[key] ?? badges[badge.version ?? ''];
+		<div className="w-full break-words py-0.5 text-lg">
+			<span className="mr-2 text-muted-foreground">{formatTime(message.timestamp)}</span>
 
-					return url ? (
-						<Image key={key} alt={badge.type} height={16} src={url} title={badge.type} width={16} />
-					) : null;
-				})}
+			{message.badges.map((badge) => {
+				const key = `${badge.type}_${badge.version}`;
+				const url = badges[key] ?? badges[badge.version ?? ''];
 
-				<span className="text-lg font-semibold" style={{ color: message.color }}>
-					{message.bestName}
-					{!message.isAction && ':'}
-				</span>
-			</div>
+				return url ? (
+					<Image
+						key={key}
+						alt={badge.type}
+						className="mr-1 inline-block align-baseline"
+						height={16}
+						src={url}
+						title={badge.type}
+						width={16}
+					/>
+				) : null;
+			})}
 
-			<div
-				className="break-word text-lg"
-				style={{
-					color: message.isAction ? message.color : undefined
-				}}
-			>
+			<span className="mr-1 font-semibold" style={{ color: message.color }}>
+				{message.bestName}
+				{!message.isAction && ':'}
+			</span>
+
+			<span style={{ color: message.isAction ? message.color : undefined }}>
 				{renderMessageWithLinks()}
-			</div>
-		</motion.div>
+			</span>
+		</div>
 	);
 }

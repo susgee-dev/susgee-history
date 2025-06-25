@@ -1,24 +1,4 @@
-interface TwitchBadge {
-	type: string;
-	version?: string;
-}
-
-interface ParsedMessage {
-	id: string;
-	timestamp: number;
-	displayName: string;
-	login: string;
-	bestName: string;
-	message: string;
-	isAction: boolean;
-	color?: string;
-	badges: TwitchBadge[];
-	roles: string[];
-	isVip: boolean;
-	isMod: boolean;
-	isSubscriber: boolean;
-	isFirstMessage: boolean;
-}
+import { ParsedMessage, TwitchBadge } from '@/types/message';
 
 class Parser {
 	private badgeCache = new Map<string, TwitchBadge>();

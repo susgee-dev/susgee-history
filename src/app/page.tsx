@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+
 import SearchChannel from '@/components/search-channel';
 import { Heading } from '@/components/ui/heading';
 

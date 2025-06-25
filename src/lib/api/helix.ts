@@ -1,41 +1,13 @@
 import 'dotenv/config';
+
 import BaseApi from './base';
 
-interface UserResponse {
-	data: User[];
-}
-
-interface User {
-	id: string;
-	login: string;
-	display_name: string;
-}
-
-interface GlobalBadgesMap {
-	[badgeId: string]: string;
-}
-
-interface TwitchBadgeVersion {
-	id: string;
-	image_url_1x: string;
-	image_url_2x: string;
-	image_url_4x: string;
-	title: string;
-	description: string;
-	click_action: string | null;
-	click_url: string | null;
-}
-
-interface TwitchBadgeSet {
-	set_id: string;
-	versions: {
-		[versionId: string]: TwitchBadgeVersion;
-	};
-}
-
-interface TwitchBadgesResponse {
-	data: TwitchBadgeSet[];
-}
+import {
+	GlobalBadgesMap,
+	TwitchBadgesResponse,
+	TwitchBadgeVersion,
+	UserResponse
+} from '@/types/api/helix';
 
 class Helix extends BaseApi {
 	private readonly headers = {
@@ -66,7 +38,7 @@ class Helix extends BaseApi {
 
 		const result: GlobalBadgesMap = {};
 
-		for (const set of response.data) {
+		for (const set of (response as TwitchBadgesResponse).data) {
 			for (const version of Object.values(set.versions) as TwitchBadgeVersion[]) {
 				if (version?.id && version.image_url_1x) {
 					result[`${set.set_id}_${version.id}`] = version.image_url_1x;
@@ -81,6 +53,10 @@ class Helix extends BaseApi {
 		const response = await super.fetch<TwitchBadgesResponse>('/chat/badges/global', {
 			headers: this.headers
 		});
+
+		if (!response) {
+			return {};
+		}
 
 		const result: GlobalBadgesMap = {};
 

@@ -2,35 +2,33 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
-interface TwitchBadge {
-	type: string;
-	version?: string;
-}
-
-interface ParsedMessage {
-	id: string;
-	timestamp: number;
-	displayName: string;
-	login: string;
-	bestName: string;
-	message: string;
-	isAction: boolean;
-	color?: string;
-	badges: TwitchBadge[];
-	roles: string[];
-	isVip: boolean;
-	isMod: boolean;
-	isSubscriber: boolean;
-	isFirstMessage: boolean;
-}
-
-interface ChatMessageProps {
-	message: ParsedMessage;
-	badges: Record<string, string>;
-}
+import { formatTime } from '@/lib/utils';
+import { ChatMessageProps } from '@/types/message';
 
 export default function ChatMessage({ message, badges }: ChatMessageProps) {
+	const renderMessageWithLinks = () => {
+		const urlRegex = /(https?:\/\/\S+)/g;
+		const parts = message.message.split(urlRegex);
+
+		return parts.map((part, index) =>
+			urlRegex.test(part) ? (
+				<Link
+					key={index}
+					className="text-blue-500 underline hover:text-blue-700"
+					href={part}
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					{part}
+				</Link>
+			) : (
+				part
+			)
+		);
+	};
+
 	return (
 		<motion.div
 			animate={{ opacity: 1, y: 0 }}
@@ -39,6 +37,7 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 			transition={{ duration: 0.2 }}
 		>
 			<div className="flex shrink-0 items-center gap-1">
+				<span className="mr-1 text-lg text-muted-foreground">{formatTime(message.timestamp)}</span>
 				{message.badges.map((badge) => {
 					const key = `${badge.type}_${badge.version}`;
 					const url = badges[key] ?? badges[badge.version ?? ''];
@@ -55,12 +54,12 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 			</div>
 
 			<div
-				className="break-words text-lg"
+				className="break-word text-lg"
 				style={{
 					color: message.isAction ? message.color : undefined
 				}}
 			>
-				{message.message}
+				{renderMessageWithLinks()}
 			</div>
 		</motion.div>
 	);

@@ -7,12 +7,17 @@ import helix from '@/lib/api/helix';
 import recentMessages from '@/lib/api/recentMessages';
 import logger from '@/lib/logger';
 import parser from '@/lib/parser';
+import { ParsedMessage } from '@/types/message';
 
-export async function generateMetadata({
-	params
-}: {
+type ChannelPageParams = {
 	params: Promise<{ channel: string }>;
-}): Promise<Metadata> {
+};
+
+type ChannelPageProps = {
+	params: Promise<{ channel: string }>;
+};
+
+export async function generateMetadata({ params }: ChannelPageParams): Promise<Metadata> {
 	const { channel } = await params;
 
 	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
@@ -32,14 +37,14 @@ export async function generateMetadata({
 	};
 }
 
-export default async function ChannelPage({ params }: { params: Promise<{ channel: string }> }) {
+export default async function ChannelPage({ params }: ChannelPageProps) {
 	const { channel } = await params;
 
 	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
 		return;
 	}
 
-	let parsed;
+	let parsed: ParsedMessage[];
 	let badges: Record<string, string>;
 
 	try {

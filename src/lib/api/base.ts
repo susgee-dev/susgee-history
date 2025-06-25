@@ -1,3 +1,5 @@
+import { ApiRequestOptions } from '@/types/api/base';
+
 export default class BaseApi {
 	protected basePath: string;
 
@@ -5,7 +7,7 @@ export default class BaseApi {
 		this.basePath = basePath;
 	}
 
-	async fetch<T>(endpoint: string, options: any = {}) {
+	async fetch<T>(endpoint: string, options: ApiRequestOptions = {}): Promise<null | T> {
 		const response = await fetch(this.basePath + endpoint, {
 			method: 'GET',
 			headers: {
@@ -17,17 +19,11 @@ export default class BaseApi {
 		});
 
 		if (!response.ok) {
-			return {
-				status: response.status,
-				error: true
-			};
+			return null;
 		}
 
 		if (response.status === 204) {
-			return {
-				status: 204,
-				error: false
-			};
+			return null;
 		}
 
 		return await response.json();

@@ -1,0 +1,85 @@
+import ChatMessage from '@/components/chat-message';
+import { Heading } from '@/components/ui/heading';
+import helix from '@/lib/api/helix';
+import recentMessages from '@/lib/api/recentMessages';
+import logger from '@/lib/logger';
+import parser from '@/lib/parser';
+import { Metadata } from 'next';
+
+type ChannelPageProps = {
+	params: {
+		channel: string;
+	};
+};
+
+export async function generateMetadata({ params }: ChannelPageProps): Promise<Metadata> {
+	const { channel } = await params;
+
+	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
+		return {
+			title: 'Invalid Channel',
+			description: 'Please enter a valid Twitch channel name'
+		};
+	}
+
+	return {
+		title: `${channel}'s Twitch Chat History`,
+		description: `Recent chat messages from Twitch channel ${channel}`,
+		openGraph: {
+			title: `${channel} - Twitch Chat History`,
+			description: `View recent chat messages from ${channel}'s Twitch stream`
+		}
+	};
+}
+
+export default async function ChannelPage({ params }: ChannelPageProps) {
+	const { channel } = await params;
+
+	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
+		return;
+	}
+
+	let parsed;
+	let badges: Record<string, string>;
+
+	try {
+		const channelId = await helix.getUserId(channel);
+		if (!channelId) {
+			return;
+		}
+
+		const [messages, globalBadges, channelBadges] = await Promise.all([
+			recentMessages.get(channel),
+			helix.getGlobalBadges(),
+			helix.getChannelBadges(channelId)
+		]);
+
+		parsed = messages
+			?.map((msg: string) => parser.process(msg))
+			?.filter(Boolean)
+			.reverse();
+
+		badges = {
+			...globalBadges,
+			...channelBadges
+		};
+	} catch (error) {
+		logger.error('Failed to fetch messages:', error);
+		return;
+	}
+
+	return (
+		<div className="container mx-auto px-4 py-8">
+			<Heading as="h1" className="flex flex-col">
+				<span>recent messages:</span>
+				<span className="gradient-text">{channel}</span>
+			</Heading>
+
+			<div className="mt-6 space-y-1 p-4 leading-snug text-white">
+				{parsed.map((msg) => (
+					<ChatMessage key={msg!.id} message={msg!} badges={badges} />
+				))}
+			</div>
+		</div>
+	);
+}

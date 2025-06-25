@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  overflow-y: scroll !important;
+  padding-right: 0 !important;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-text;
+}

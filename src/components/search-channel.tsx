@@ -2,18 +2,18 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 
 export default function SearchChannel() {
 	const router = useRouter();
 
 	const [inputValue, setInputValue] = useState('');
 
-	const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleInput = (event: ChangeEvent<HTMLInputElement>) => {
 		setInputValue(event.target.value.trim());
 	};
 
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (inputValue) {
 			router.push(`/${inputValue}`);

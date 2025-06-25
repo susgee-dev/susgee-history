@@ -1,4 +1,5 @@
 import ChatMessage from '@/components/chat-message';
+import Error from '@/components/ui/error';
 import { Heading } from '@/components/ui/heading';
 import helix from '@/lib/api/helix';
 import recentMessages from '@/lib/api/recentMessages';
@@ -45,7 +46,13 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
 	try {
 		const channelId = await helix.getUserId(channel);
 		if (!channelId) {
-			return;
+			return (
+				<Error
+					type="notFound"
+					title="Channel not found"
+					message="The channel you're looking for doesn't exist"
+				/>
+			);
 		}
 
 		const [messages, globalBadges, channelBadges] = await Promise.all([
@@ -70,12 +77,12 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			<Heading as="h1" className="flex flex-col">
+			<Heading as="h1" className="mb-6 flex flex-col border-b border-primary/30 pb-6">
 				<span>recent messages:</span>
 				<span className="gradient-text">{channel}</span>
 			</Heading>
 
-			<div className="mt-6 space-y-1 p-4 leading-snug text-white">
+			<div className="space-y-1 leading-snug text-white">
 				{parsed.map((msg) => (
 					<ChatMessage key={msg!.id} message={msg!} badges={badges} />
 				))}

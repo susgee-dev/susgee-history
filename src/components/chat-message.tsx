@@ -46,7 +46,7 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 				})}
 
 				<span className="text-lg font-semibold" style={{ color: message.color || '#aaa' }}>
-					{message.displayName}:
+					{message.bestName}:
 				</span>
 			</div>
 

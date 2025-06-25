@@ -15,6 +15,7 @@ class RecentMessages extends BaseApi {
 
 	async get(channel: string): Promise<string[]> {
 		const response = await super.fetch<RecentMessagesResponse>(`${channel}?limit=800`);
+
 		return response?.messages || [];
 	}
 }

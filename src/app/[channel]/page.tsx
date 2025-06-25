@@ -1,3 +1,5 @@
+import { Metadata } from 'next';
+
 import ChatMessage from '@/components/chat-message';
 import Error from '@/components/ui/error';
 import { Heading } from '@/components/ui/heading';
@@ -5,15 +7,12 @@ import helix from '@/lib/api/helix';
 import recentMessages from '@/lib/api/recentMessages';
 import logger from '@/lib/logger';
 import parser from '@/lib/parser';
-import { Metadata } from 'next';
 
-type ChannelPageProps = {
-	params: {
-		channel: string;
-	};
-};
-
-export async function generateMetadata({ params }: ChannelPageProps): Promise<Metadata> {
+export async function generateMetadata({
+	params
+}: {
+	params: Promise<{ channel: string }>;
+}): Promise<Metadata> {
 	const { channel } = await params;
 
 	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
@@ -33,7 +32,7 @@ export async function generateMetadata({ params }: ChannelPageProps): Promise<Me
 	};
 }
 
-export default async function ChannelPage({ params }: ChannelPageProps) {
+export default async function ChannelPage({ params }: { params: Promise<{ channel: string }> }) {
 	const { channel } = await params;
 
 	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
@@ -45,12 +44,13 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
 
 	try {
 		const channelId = await helix.getUserId(channel);
+
 		if (!channelId) {
 			return (
 				<Error
-					type="notFound"
-					title="Channel not found"
 					message="The channel you're looking for doesn't exist"
+					title="Channel not found"
+					type="notFound"
 				/>
 			);
 		}
@@ -72,6 +72,7 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
 		};
 	} catch (error) {
 		logger.error('Failed to fetch messages:', error);
+
 		return;
 	}
 
@@ -84,7 +85,7 @@ export default async function ChannelPage({ params }: ChannelPageProps) {
 
 			<div className="space-y-1 leading-snug text-white">
 				{parsed.map((msg) => (
-					<ChatMessage key={msg!.id} message={msg!} badges={badges} />
+					<ChatMessage key={msg!.id} badges={badges} message={msg!} />
 				))}
 			</div>
 		</div>

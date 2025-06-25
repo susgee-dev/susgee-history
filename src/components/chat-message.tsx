@@ -31,17 +31,18 @@ interface ChatMessageProps {
 export default function ChatMessage({ message, badges }: ChatMessageProps) {
 	return (
 		<motion.div
+			animate={{ opacity: 1, y: 0 }}
 			className="flex w-full items-start gap-2 py-0.5"
 			initial={{ opacity: 0, y: 4 }}
-			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.2 }}
 		>
 			<div className="flex shrink-0 items-center gap-1">
 				{message.badges.map((badge) => {
 					const key = `${badge.type}_${badge.version}`;
 					const url = badges[key] ?? badges[badge.version ?? ''];
+
 					return url ? (
-						<img key={key} src={url} alt={badge.type} className="h-4 w-4" title={badge.type} />
+						<img key={key} alt={badge.type} className="h-4 w-4" src={url} title={badge.type} />
 					) : null;
 				})}
 

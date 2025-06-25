@@ -16,7 +16,7 @@ export function Link({ href, className, unstyled = false, ...props }: LinkProps)
 			className={cn(
 				className,
 				!unstyled &&
-					'relative inline-flex items-center pl-1 text-medium text-primary transition-opacity tap-highlight-transparent hover:opacity-hover active:opacity-disabled',
+					'text-medium tap-highlight-transparent hover:opacity-hover active:opacity-disabled relative inline-flex items-center pl-1 text-primary transition-opacity',
 				'no-underline outline-none'
 			)}
 			href={href}

@@ -1,8 +1,10 @@
-import '@/styles/globals.css';
 import { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import React from 'react';
+
 import Footer from '@/components/footer';
+
+import '@/styles/globals.css';
 
 export const metadata: Metadata = {
 	title: {

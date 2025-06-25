@@ -26,15 +26,18 @@ class Parser {
 	process(rawMessage: string): ParsedMessage | null {
 		try {
 			const msgSplitIndex = rawMessage.indexOf(' PRIVMSG ');
+
 			if (msgSplitIndex === -1) return null;
 
 			const prefixAndTags = rawMessage.substring(0, msgSplitIndex);
 			const tagsPart = prefixAndTags.startsWith('@') ? prefixAndTags.split(' ')[0] : '';
 			const loginMatch = rawMessage.match(/:[^!]+!([^@]+)@/);
+
 			if (!loginMatch) return null;
 			const login = loginMatch[1];
 
 			const messageMatch = rawMessage.match(/PRIVMSG #[^ ]+ ?:?(.*)$/);
+
 			if (!messageMatch) return null;
 			const messageContent = messageMatch[1].trim();
 
@@ -63,38 +66,49 @@ class Parser {
 
 	private parseTags(tagsPart: string): Map<string, string> {
 		const tagsMap = new Map<string, string>();
+
 		if (!tagsPart.startsWith('@')) return tagsMap;
 
 		const tags = tagsPart.slice(1).split(';');
+
 		for (const tag of tags) {
 			const [key, value = ''] = tag.split('=');
+
 			tagsMap.set(key, decodeURIComponent(value));
 		}
+
 		return tagsMap;
 	}
 
 	private parseBadges(badgesStr: string): TwitchBadge[] {
 		if (!badgesStr) return [];
+
 		return badgesStr.split(',').map((badgeStr) => {
 			const [type, version] = badgeStr.split('/');
 			const cacheKey = `${type}-${version}`;
+
 			if (this.badgeCache.has(cacheKey)) return this.badgeCache.get(cacheKey)!;
 
 			const badge = { type, version };
+
 			this.badgeCache.set(cacheKey, badge);
+
 			return badge;
 		});
 	}
 
 	private parseRoles(tags: Map<string, string>): string[] {
 		const roles: string[] = [];
+
 		if (tags.get('subscriber') === '1') roles.push('subscriber');
 		if (tags.get('mod') === '1') roles.push('moderator');
 		if (tags.get('vip') === '1') roles.push('vip');
 		if (tags.get('first-msg') === '1') roles.push('first-time');
+
 		return roles;
 	}
 }
 
 const parser = new Parser();
+
 export default parser;

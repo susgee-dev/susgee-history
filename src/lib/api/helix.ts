@@ -97,4 +97,5 @@ class Helix extends BaseApi {
 }
 
 const helix = new Helix();
+
 export default helix;

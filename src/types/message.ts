@@ -16,6 +16,7 @@ export type BaseMessage = {
 	bestName: string;
 	color?: string;
 	badges: TwitchBadge[];
+	emotes: Emote[];
 	roles: string[];
 	isVip: boolean;
 	isMod: boolean;
@@ -26,6 +27,11 @@ export type BaseMessage = {
 export type ProcessedWord =
 	| { type: 'text'; content: string }
 	| { type: 'emote'; id: string; alias: string; url: string };
+
+export type Emote = {
+	emoteId: string;
+	slicePart: string;
+};
 
 export type ParsedPrivMsg = BaseMessage & {
 	type: MessageTypes.PRIVMSG;

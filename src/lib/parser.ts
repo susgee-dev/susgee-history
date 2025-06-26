@@ -2,10 +2,12 @@ import logger from '@/lib/logger';
 import { getBestName } from '@/lib/utils';
 import {
 	BaseMessage,
+	Emote,
 	MessageTypes,
 	ParsedMessage,
 	ParsedPrivMsg,
 	ParsedUserNotice,
+	ProcessedWord,
 	TwitchBadge
 } from '@/types/message';
 
@@ -155,6 +157,7 @@ class Parser {
 			bestName: getBestName(displayName, login),
 			color: tags.get('color') || this.fallbackColor,
 			badges: this.parseBadges(tags.get('badges') || ''),
+			emotes: this.parseEmotes(tags.get('emotes') || ''),
 			roles: this.parseRoles(tags),
 			isVip: tags.get('vip') === '1',
 			isMod: tags.get('mod') === '1',
@@ -206,6 +209,16 @@ class Parser {
 
 		return roles;
 	}
+
+	private parseEmotes(emotesStr: string): Emote[] {
+		if (!emotesStr) return [];
+
+		return emotesStr.split('/').map((emoteStr) => {
+			const [emoteId, slicePart] = emoteStr.split(':');
+
+			return { emoteId, slicePart };
+		});
+	}
 }
 
 const parser = new Parser();
@@ -214,37 +227,57 @@ export default parser;
 
 export function processWithEmotes(
 	message: string,
-	emotes: Array<{ id: string; alias: string }>
+	sevenTvEmotes: Array<{ id: string; alias: string }>
 ): ParsedMessage | null {
 	const parsed = parser.process(message);
 
 	if (!parsed) return null;
 
+	const processedWords: ProcessedWord[] = [];
 	const emoteMap = new Map<string, string>();
 
-	emotes.forEach((emote) => {
+	sevenTvEmotes.forEach((emote) => {
 		emoteMap.set(emote.alias.toLowerCase(), emote.id);
 	});
 
+	let currentPosition = 0;
 	const words = parsed.message.split(' ');
-	const processedWords = words.map((word) => {
-		const cleanWord = word.replace(/[^\w]/g, '').toLowerCase();
-		const emoteId = emoteMap.get(cleanWord);
 
-		if (emoteId) {
-			return {
-				type: 'emote' as const,
-				id: emoteId,
-				alias: word,
-				url: `https://cdn.7tv.app/emote/${emoteId}/1x.avif`
-			};
+	for (const word of words) {
+		const twitchEmote = parsed.emotes.find((emote) => {
+			const [start] = emote.slicePart.split('-').map(Number);
+			return start === currentPosition;
+		});
+
+		if (twitchEmote) {
+			const [start, end] = twitchEmote.slicePart.split('-').map(Number);
+			processedWords.push({
+				type: 'emote',
+				id: twitchEmote.emoteId,
+				alias: parsed.message.slice(start, end + 1),
+				url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
+			});
+		} else {
+			const cleanWord = word.replace(/[^\w]/g, '').toLowerCase();
+			const sevenTvEmoteId = emoteMap.get(cleanWord);
+
+			if (sevenTvEmoteId) {
+				processedWords.push({
+					type: 'emote',
+					id: sevenTvEmoteId,
+					alias: word,
+					url: `https://cdn.7tv.app/emote/${sevenTvEmoteId}/1x.avif`
+				});
+			} else {
+				processedWords.push({
+					type: 'text',
+					content: word + ' '
+				});
+			}
 		}
 
-		return {
-			type: 'text' as const,
-			content: word
-		};
-	});
+		currentPosition += word.length + 1;
+	}
 
 	return {
 		...parsed,

@@ -30,14 +30,14 @@ class SevenTV extends BaseApi {
 		}`;
 
 		const userResponse = await super.fetch<any>('', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
 			body: JSON.stringify({
 				query: userQuery,
 				variables: { id: twitchId }
-			})
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			method: 'POST'
 		});
 
 		if (!userResponse || !userResponse.data || !userResponse.data.users) {

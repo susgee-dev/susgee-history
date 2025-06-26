@@ -44,8 +44,13 @@ class SevenTV extends BaseApi {
 			return null;
 		}
 
+		const userByConnection = userResponse.data.users.userByConnection;
+		if (!userByConnection || !userByConnection.style || !userByConnection.style.activeEmoteSet) {
+			return null;
+		}
+
 		return {
-			emote_set: userResponse.data.users.userByConnection.style.activeEmoteSet.emotes
+			emote_set: userByConnection.style.activeEmoteSet.emotes
 		};
 	}
 }

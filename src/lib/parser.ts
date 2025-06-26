@@ -38,7 +38,7 @@ class Parser {
 			if (tags.get('reply-parent-msg-id')) {
 				const displayName = tags.get('reply-parent-display-name') || '';
 				const login = tags.get('reply-parent-user-login') || '';
-				const text = tags.get('reply-parent-msg-body') || '';
+				const text = tags.get('reply-parent-msg-body')?.replaceAll('\\s', ' ') || '';
 
 				reply = {
 					text,

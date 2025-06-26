@@ -3,7 +3,7 @@
 import sevenTV from '@/lib/api/7tv';
 import helix from '@/lib/api/helix';
 import recentMessages from '@/lib/api/recentMessages';
-import parser, { processWithEmotes } from '@/lib/parser';
+import { processWithEmotes } from '@/lib/parser';
 import { ParsedMessage } from '@/types/message';
 
 export async function fetchChannelData(channel: string) {
@@ -31,7 +31,6 @@ export async function fetchChannelData(channel: string) {
 			?.map((msg: string) => processWithEmotes(msg, emotes))
 			?.filter((msg): msg is ParsedMessage => !!msg)
 			.reverse() || [];
-
 
 	return {
 		messages: parsed,

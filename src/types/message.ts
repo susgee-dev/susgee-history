@@ -23,7 +23,7 @@ export type BaseMessage = {
 	isFirstMessage: boolean;
 };
 
-export type ProcessedWord = 
+export type ProcessedWord =
 	| { type: 'text'; content: string }
 	| { type: 'emote'; id: string; alias: string; url: string };
 

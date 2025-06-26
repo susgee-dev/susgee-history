@@ -42,4 +42,4 @@ export interface SevenTVUser {
 
 export interface SevenTVUserResponse {
 	user: SevenTVUser;
-} 
+}

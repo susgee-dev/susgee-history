@@ -1,6 +1,6 @@
-import BaseApi from "./base";
-import { SevenTVEmoteSetResponse } from "@/types/api/7tv";
+import BaseApi from './base';
 
+import { SevenTVEmoteSetResponse } from '@/types/api/7tv';
 
 class SevenTV extends BaseApi {
 	constructor() {
@@ -32,7 +32,7 @@ class SevenTV extends BaseApi {
 		const userResponse = await super.fetch<any>('', {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
 				query: userQuery,
@@ -40,15 +40,13 @@ class SevenTV extends BaseApi {
 			})
 		});
 
-
 		if (!userResponse || !userResponse.data || !userResponse.data.users) {
 			return null;
 		}
 
-        return {
-            emote_set: userResponse.data.users.userByConnection.style.activeEmoteSet.emotes
-        }
-
+		return {
+			emote_set: userResponse.data.users.userByConnection.style.activeEmoteSet.emotes
+		};
 	}
 }
 

@@ -51,12 +51,15 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 			</div>
 
 			{isLoading ? (
-				<div className="flex justify-center items-center py-16">
+				<div className="flex items-center justify-center py-16">
 					<div className="relative">
-						<div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-						<div className="absolute inset-0 w-8 h-8 border-2 border-transparent border-t-primary/60 rounded-full animate-spin" style={{ animationDelay: '-0.5s', animationDuration: '1.5s' }} />
+						<div className="h-8 w-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+						<div
+							className="absolute inset-0 h-8 w-8 animate-spin rounded-full border-2 border-transparent border-t-primary/60"
+							style={{ animationDelay: '-0.5s', animationDuration: '1.5s' }}
+						/>
 					</div>
-					<span className="ml-3 text-primary/70 text-sm font-medium">Loading messages...</span>
+					<span className="ml-3 text-sm font-medium text-primary/70">Loading messages...</span>
 				</div>
 			) : (
 				<div className="flex flex-col gap-1">

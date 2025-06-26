@@ -13,34 +13,32 @@ function EmoteImage({ src, alt, title }: { src: string; alt: string; title: stri
 
 	if (hasError) {
 		return (
-			<span className="inline-block w-7 h-7 bg-gray-300 rounded text-xs flex items-center justify-center text-gray-600">
+			<span className="inline-block flex h-7 w-7 items-center justify-center rounded bg-gray-300 text-xs text-gray-600">
 				{alt}
 			</span>
 		);
 	}
 
 	return (
-		<div className="inline-block relative">
-			{isLoading && (
-				<div className="w-7 h-7 bg-gray-200 animate-pulse rounded" />
-			)}
+		<div className="relative inline-block">
+			{isLoading && <div className="h-7 w-7 animate-pulse rounded bg-gray-200" />}
 			<Image
-				src={src}
+				unoptimized
 				alt={alt}
-				width={28}
-				height={28}
 				className={cn(
-					"inline-block align-middle mx-0.5 transition-opacity duration-200",
-					isLoading ? "opacity-0" : "opacity-100"
+					'mx-0.5 inline-block align-middle transition-opacity duration-200',
+					isLoading ? 'opacity-0' : 'opacity-100'
 				)}
-				title={title}
+				height={28}
 				loading="lazy"
-				onLoad={() => setIsLoading(false)}
+				src={src}
+				title={title}
+				width={28}
 				onError={() => {
 					setIsLoading(false);
 					setHasError(true);
 				}}
-				unoptimized
+				onLoad={() => setIsLoading(false)}
 			/>
 		</div>
 	);
@@ -73,15 +71,9 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 	const renderProcessedContent = (content: ProcessedWord[]) => {
 		return content.map((word, index) => {
 			if (word.type === 'emote') {
-				return (
-					<EmoteImage
-						key={index}
-						src={word.url}
-						alt={word.alias}
-						title={word.alias}
-					/>
-				);
+				return <EmoteImage key={index} alt={word.alias} src={word.url} title={word.alias} />;
 			}
+
 			return <span key={index}>{word.content} </span>;
 		});
 	};
@@ -130,14 +122,14 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 					return url ? (
 						<Image
 							key={key}
+							unoptimized
 							alt={badge.type}
 							className="mr-1 inline-block overflow-hidden align-baseline"
 							height={16}
+							loading="lazy"
 							src={url}
 							title={badge.type}
 							width={16}
-							loading="lazy"
-							unoptimized
 						/>
 					) : null;
 				})}
@@ -155,7 +147,7 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 			>
 				{message.type === 'USERNOTICE' && (!message.message || message.msgId !== 'resub')
 					? processSystemMsg(message.systemMsg, message.message)
-					: message.processedContent 
+					: message.processedContent
 						? renderProcessedContent(message.processedContent)
 						: renderMessageWithLinks(message.message)}
 			</span>

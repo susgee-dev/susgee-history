@@ -3,19 +3,17 @@ export type TwitchBadge = {
 	version?: string;
 };
 
-export type ParsedMessage = {
+export enum MessageTypes {
+	PRIVMSG = 'PRIVMSG',
+	USERNOTICE = 'USERNOTICE'
+}
+
+export type BaseMessage = {
 	id: string;
 	timestamp: number;
 	displayName: string;
 	login: string;
 	bestName: string;
-	message: string;
-	reply: null | {
-		login: string;
-		displayName: string;
-		text: string;
-	};
-	isAction: boolean;
 	color?: string;
 	badges: TwitchBadge[];
 	roles: string[];
@@ -24,6 +22,27 @@ export type ParsedMessage = {
 	isSubscriber: boolean;
 	isFirstMessage: boolean;
 };
+
+export type ParsedPrivMsg = BaseMessage & {
+	type: MessageTypes.PRIVMSG;
+	message: string;
+	reply: null | {
+		login: string;
+		displayName: string;
+		text: string;
+	};
+	isAction: boolean;
+};
+
+export type ParsedUserNotice = BaseMessage & {
+	type: MessageTypes.USERNOTICE;
+	message: string;
+	msgId: string;
+	systemMsg: string;
+	msgParams: Record<string, string>;
+};
+
+export type ParsedMessage = ParsedPrivMsg | ParsedUserNotice;
 
 export type ChatMessageProps = {
 	message: ParsedMessage;

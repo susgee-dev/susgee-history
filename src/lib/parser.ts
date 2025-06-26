@@ -1,5 +1,13 @@
+import logger from '@/lib/logger';
 import { getBestName } from '@/lib/utils';
-import { ParsedMessage, TwitchBadge } from '@/types/message';
+import {
+	BaseMessage,
+	MessageTypes,
+	ParsedMessage,
+	ParsedPrivMsg,
+	ParsedUserNotice,
+	TwitchBadge
+} from '@/types/message';
 
 class Parser {
 	private badgeCache = new Map<string, TwitchBadge>();
@@ -7,10 +15,28 @@ class Parser {
 
 	process(rawMessage: string): ParsedMessage | null {
 		try {
-			const msgSplitIndex = rawMessage.indexOf(' PRIVMSG ');
+			const privMsgSplitIndex = rawMessage.indexOf(' PRIVMSG ');
 
-			if (msgSplitIndex === -1) return null;
+			if (privMsgSplitIndex !== -1) {
+				return this.processPrivMsg(rawMessage, privMsgSplitIndex);
+			}
 
+			const userNoticeSplitIndex = rawMessage.indexOf(' USERNOTICE ');
+
+			if (userNoticeSplitIndex !== -1) {
+				return this.processUserNotice(rawMessage, userNoticeSplitIndex);
+			}
+
+			logger.warn(`unhandled message type: ${rawMessage}`);
+
+			return null;
+		} catch {
+			return null;
+		}
+	}
+
+	private processPrivMsg(rawMessage: string, msgSplitIndex: number): ParsedPrivMsg | null {
+		try {
 			const prefixAndTags = rawMessage.substring(0, msgSplitIndex);
 			const tagsPart = prefixAndTags.startsWith('@') ? prefixAndTags.split(' ')[0] : '';
 			const loginMatch = rawMessage.match(/:[^!]+!([^@]+)@/);
@@ -36,14 +62,14 @@ class Parser {
 			let reply = null;
 
 			if (tags.get('reply-parent-msg-id')) {
-				const displayName = tags.get('reply-parent-display-name') || '';
-				const login = tags.get('reply-parent-user-login') || '';
+				const replyDisplayName = tags.get('reply-parent-display-name') || '';
+				const replyLogin = tags.get('reply-parent-user-login') || '';
 				const text = tags.get('reply-parent-msg-body')?.replaceAll('\\s', ' ') || '';
 
 				reply = {
 					text,
-					login,
-					displayName
+					login: replyLogin,
+					displayName: replyDisplayName
 				};
 			}
 
@@ -55,26 +81,86 @@ class Parser {
 				}
 			}
 
+			const baseMessage = this.createBaseMessage(tags, login, displayName);
+
 			return {
-				id: tags.get('id') || '',
-				timestamp: parseInt(tags.get('tmi-sent-ts') || '0', 10),
-				displayName,
-				login,
-				bestName: getBestName(displayName, login),
+				...baseMessage,
+				type: MessageTypes.PRIVMSG,
 				message: messageContent,
 				isAction,
-				color: tags.get('color') || this.fallbackColor,
-				badges: this.parseBadges(tags.get('badges') || ''),
-				roles: this.parseRoles(tags),
-				isVip: tags.get('vip') === '1',
-				isMod: tags.get('mod') === '1',
-				isSubscriber: tags.get('subscriber') === '1',
-				isFirstMessage: tags.get('first-msg') === '1',
 				reply
 			};
-		} catch {
+		} catch (error) {
+			logger.error('Error processing PRIVMSG:', error);
+
 			return null;
 		}
+	}
+
+	private processUserNotice(rawMessage: string, msgSplitIndex: number): ParsedUserNotice | null {
+		try {
+			const prefixAndTags = rawMessage.substring(0, msgSplitIndex);
+			const tagsPart = prefixAndTags.startsWith('@') ? prefixAndTags.split(' ')[0] : '';
+			const loginMatch = rawMessage.match(/:[^!]+!([^@]+)@/) || rawMessage.match(/login=([^;]+)/);
+
+			if (!loginMatch) return null;
+			const login = loginMatch[1];
+
+			const messageMatch = rawMessage.match(/USERNOTICE #[^ ]+ ?:?(.*)$/);
+			const messageContent = messageMatch ? messageMatch[1].trim() : '';
+
+			const tags = this.parseTags(tagsPart);
+			const displayName = tags.get('display-name') || login;
+
+			const msgId = tags.get('msg-id') || '';
+			const systemMsg = tags.get('system-msg')?.replaceAll('\\s', ' ') || '';
+
+			const msgParams: Record<string, string> = {};
+
+			tags.forEach((value, key) => {
+				if (key.startsWith('msg-param-')) {
+					const paramName = key.replace('msg-param-', '');
+
+					msgParams[paramName] = value;
+				}
+			});
+
+			const baseMessage = this.createBaseMessage(tags, login, displayName);
+
+			return {
+				...baseMessage,
+				type: MessageTypes.USERNOTICE,
+				message: messageContent,
+				msgId,
+				systemMsg,
+				msgParams
+			};
+		} catch (error) {
+			logger.error('Error processing USERNOTICE:', error);
+
+			return null;
+		}
+	}
+
+	private createBaseMessage(
+		tags: Map<string, string>,
+		login: string,
+		displayName: string
+	): BaseMessage {
+		return {
+			id: tags.get('id') || '',
+			timestamp: parseInt(tags.get('tmi-sent-ts') || '0', 10),
+			displayName,
+			login,
+			bestName: getBestName(displayName, login),
+			color: tags.get('color') || this.fallbackColor,
+			badges: this.parseBadges(tags.get('badges') || ''),
+			roles: this.parseRoles(tags),
+			isVip: tags.get('vip') === '1',
+			isMod: tags.get('mod') === '1',
+			isSubscriber: tags.get('subscriber') === '1',
+			isFirstMessage: tags.get('first-msg') === '1'
+		};
 	}
 
 	private parseTags(tagsPart: string): Map<string, string> {

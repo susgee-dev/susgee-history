@@ -38,12 +38,17 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 	}
 
 	return (
-		<div className="container mx-auto px-4 py-8">
+		<>
 			<Link href="/">← back to search</Link>
-			<Heading as="h1" className="flex flex-col border-b border-primary/30 pb-6">
-				<span>recent messages for:</span>
-				<span className="gradient-text w-fit">{channel}</span>
-			</Heading>
+
+			<div className="mb-4 flex flex-wrap items-end justify-between border-b border-primary/30 pb-4">
+				<Heading as="h3" variant="compact">
+					recent messages for:
+				</Heading>
+				<Heading as="h1" className="gradient-text flex w-fit flex-col" variant="compact">
+					{channel}
+				</Heading>
+			</div>
 
 			{isLoading ? (
 				<div>Loading...</div>
@@ -54,6 +59,6 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 					))}
 				</div>
 			)}
-		</div>
+		</>
 	);
 }

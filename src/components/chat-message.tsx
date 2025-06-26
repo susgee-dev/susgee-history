@@ -50,7 +50,7 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 			className={cn(
 				'w-full break-words px-1 text-lg/6',
 				message.isFirstMessage ? 'bg-green-500/20' : '',
-				message.type === 'USERNOTICE' ? 'bg-purple-500/20' : ''
+				message.type === 'USERNOTICE' ? 'bg-purple-500/20 py-1' : ''
 			)}
 		>
 			{message.type === 'PRIVMSG' && message.reply && (

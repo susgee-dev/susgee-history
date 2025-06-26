@@ -23,9 +23,14 @@ export type BaseMessage = {
 	isFirstMessage: boolean;
 };
 
+export type ProcessedWord = 
+	| { type: 'text'; content: string }
+	| { type: 'emote'; id: string; alias: string; url: string };
+
 export type ParsedPrivMsg = BaseMessage & {
 	type: MessageTypes.PRIVMSG;
 	message: string;
+	processedContent?: ProcessedWord[];
 	reply: null | {
 		login: string;
 		displayName: string;
@@ -37,6 +42,7 @@ export type ParsedPrivMsg = BaseMessage & {
 export type ParsedUserNotice = BaseMessage & {
 	type: MessageTypes.USERNOTICE;
 	message: string;
+	processedContent?: ProcessedWord[];
 	msgId: string;
 	systemMsg: string;
 	msgParams: Record<string, string>;

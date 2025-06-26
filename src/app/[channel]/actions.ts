@@ -1,8 +1,9 @@
 'use server';
 
+import sevenTV from '@/lib/api/7tv';
 import helix from '@/lib/api/helix';
 import recentMessages from '@/lib/api/recentMessages';
-import parser from '@/lib/parser';
+import parser, { processWithEmotes } from '@/lib/parser';
 import { ParsedMessage } from '@/types/message';
 
 export async function fetchChannelData(channel: string) {
@@ -16,17 +17,21 @@ export async function fetchChannelData(channel: string) {
 		throw new Error('Channel not found');
 	}
 
-	const [messages, globalBadges, channelBadges] = await Promise.all([
+	const [messages, globalBadges, channelBadges, emoteSet] = await Promise.all([
 		recentMessages.get(channel),
 		helix.getGlobalBadges(),
-		helix.getChannelBadges(channelId)
+		helix.getChannelBadges(channelId),
+		sevenTV.getUserEmoteSet(channelId)
 	]);
+
+	const emotes = emoteSet?.emote_set?.items || [];
 
 	const parsed =
 		messages
-			?.map((msg: string) => parser.process(msg))
+			?.map((msg: string) => processWithEmotes(msg, emotes))
 			?.filter((msg): msg is ParsedMessage => !!msg)
 			.reverse() || [];
+
 
 	return {
 		messages: parsed,

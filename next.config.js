@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	images: {
-		remotePatterns: [new URL('https://static-cdn.jtvnw.net/**')]
+		remotePatterns: [
+			{ protocol: 'https', hostname: 'static-cdn.jtvnw.net' },
+			{ protocol: 'https', hostname: 'cdn.7tv.app' }
+		]
 	}
 };
 

@@ -179,6 +179,7 @@ class Parser {
 		return tagsMap;
 	}
 
+
 	private parseBadges(badgesStr: string): TwitchBadge[] {
 		if (!badgesStr) return [];
 
@@ -211,3 +212,38 @@ class Parser {
 const parser = new Parser();
 
 export default parser;
+
+export function processWithEmotes(message: string, emotes: Array<{ id: string; alias: string }>): ParsedMessage | null {
+	const parsed = parser.process(message);
+	if (!parsed) return null;
+
+	const emoteMap = new Map<string, string>();
+	emotes.forEach(emote => {
+		emoteMap.set(emote.alias.toLowerCase(), emote.id);
+	});
+
+	const words = parsed.message.split(' ');
+	const processedWords = words.map(word => {
+		const cleanWord = word.replace(/[^\w]/g, '').toLowerCase();
+		const emoteId = emoteMap.get(cleanWord);
+		
+		if (emoteId) {
+			return {
+				type: 'emote' as const,
+				id: emoteId,
+				alias: word,
+				url: `https://cdn.7tv.app/emote/${emoteId}/1x.avif`
+			};
+		}
+		
+		return {
+			type: 'text' as const,
+			content: word
+		};
+	});
+
+	return {
+		...parsed,
+		processedContent: processedWords
+	};
+}

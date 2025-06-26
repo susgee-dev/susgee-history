@@ -2,9 +2,49 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 import { cn, formatTime } from '@/lib/utils';
-import { ChatMessageProps, MessageTypes } from '@/types/message';
+import { ChatMessageProps, MessageTypes, ProcessedWord } from '@/types/message';
+
+function EmoteImage({ src, alt, title }: { src: string; alt: string; title: string }) {
+	const [isLoading, setIsLoading] = useState(true);
+	const [hasError, setHasError] = useState(false);
+
+	if (hasError) {
+		return (
+			<span className="inline-block w-7 h-7 bg-gray-300 rounded text-xs flex items-center justify-center text-gray-600">
+				{alt}
+			</span>
+		);
+	}
+
+	return (
+		<div className="inline-block relative">
+			{isLoading && (
+				<div className="w-7 h-7 bg-gray-200 animate-pulse rounded" />
+			)}
+			<Image
+				src={src}
+				alt={alt}
+				width={28}
+				height={28}
+				className={cn(
+					"inline-block align-middle mx-0.5 transition-opacity duration-200",
+					isLoading ? "opacity-0" : "opacity-100"
+				)}
+				title={title}
+				loading="lazy"
+				onLoad={() => setIsLoading(false)}
+				onError={() => {
+					setIsLoading(false);
+					setHasError(true);
+				}}
+				unoptimized
+			/>
+		</div>
+	);
+}
 
 export default function ChatMessage({ message, badges }: ChatMessageProps) {
 	const renderMessageWithLinks = (text: string = '') => {
@@ -28,6 +68,22 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 				part
 			)
 		);
+	};
+
+	const renderProcessedContent = (content: ProcessedWord[]) => {
+		return content.map((word, index) => {
+			if (word.type === 'emote') {
+				return (
+					<EmoteImage
+						key={index}
+						src={word.url}
+						alt={word.alias}
+						title={word.alias}
+					/>
+				);
+			}
+			return <span key={index}>{word.content} </span>;
+		});
 	};
 
 	const processSystemMsg = (msg: string, text: string) => {
@@ -80,6 +136,8 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 							src={url}
 							title={badge.type}
 							width={16}
+							loading="lazy"
+							unoptimized
 						/>
 					) : null;
 				})}
@@ -97,7 +155,9 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 			>
 				{message.type === 'USERNOTICE' && (!message.message || message.msgId !== 'resub')
 					? processSystemMsg(message.systemMsg, message.message)
-					: renderMessageWithLinks(message.message)}
+					: message.processedContent 
+						? renderProcessedContent(message.processedContent)
+						: renderMessageWithLinks(message.message)}
 			</span>
 		</div>
 	);

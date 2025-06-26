@@ -48,7 +48,7 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 			{isLoading ? (
 				<div>Loading...</div>
 			) : (
-				<div className="space-y-1 leading-snug text-white">
+				<div className="flex flex-col gap-1">
 					{parsed.map((msg) => (
 						<ChatMessage key={msg.id} badges={badges} message={msg} />
 					))}

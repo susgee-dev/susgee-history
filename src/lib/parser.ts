@@ -1,3 +1,4 @@
+import { getBestName } from '@/lib/utils';
 import { ParsedMessage, TwitchBadge } from '@/types/message';
 
 class Parser {
@@ -32,12 +33,34 @@ class Parser {
 			const tags = this.parseTags(tagsPart);
 			const displayName = tags.get('display-name') || login;
 
+			let reply = null;
+
+			if (tags.get('reply-parent-msg-id')) {
+				const displayName = tags.get('reply-parent-display-name') || '';
+				const login = tags.get('reply-parent-user-login') || '';
+				const text = tags.get('reply-parent-msg-body') || '';
+
+				reply = {
+					text,
+					login,
+					displayName
+				};
+			}
+
+			if (reply && messageContent.startsWith('@')) {
+				const spaceIndex = messageContent.indexOf(' ');
+
+				if (spaceIndex !== -1) {
+					messageContent = messageContent.slice(spaceIndex + 1).trim();
+				}
+			}
+
 			return {
 				id: tags.get('id') || '',
 				timestamp: parseInt(tags.get('tmi-sent-ts') || '0', 10),
 				displayName,
 				login,
-				bestName: displayName?.toLowerCase() === login ? displayName : `${displayName} (${login})`,
+				bestName: getBestName(displayName, login),
 				message: messageContent,
 				isAction,
 				color: tags.get('color') || this.fallbackColor,
@@ -46,7 +69,8 @@ class Parser {
 				isVip: tags.get('vip') === '1',
 				isMod: tags.get('mod') === '1',
 				isSubscriber: tags.get('subscriber') === '1',
-				isFirstMessage: tags.get('first-msg') === '1'
+				isFirstMessage: tags.get('first-msg') === '1',
+				reply
 			};
 		} catch {
 			return null;

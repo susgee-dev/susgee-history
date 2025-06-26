@@ -2,12 +2,12 @@ import { Metadata } from 'next';
 
 import ClientPage from './client';
 
-type ChannelPageParams = {
-	params: { channel: string };
+type PageParams = {
+	params: Promise<{ channel: string }>;
 };
 
-export async function generateMetadata({ params }: ChannelPageParams): Promise<Metadata> {
-	const { channel } = params;
+export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
+	const { channel } = await params;
 
 	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
 		return {
@@ -21,11 +21,13 @@ export async function generateMetadata({ params }: ChannelPageParams): Promise<M
 		description: `Recent chat messages from Twitch channel ${channel}`,
 		openGraph: {
 			title: `${channel} - Twitch Chat History`,
-			description: `View recent chat messages from ${channel}'s Twitch stream`
+			description: `View recent chat messages from ${channel}'s Twitch channel`
 		}
 	};
 }
 
-export default function ChannelPage({ params }: ChannelPageParams) {
-	return <ClientPage channel={params.channel} />;
+export default async function ChannelPage({ params }: PageParams) {
+	const { channel } = await params;
+
+	return <ClientPage channel={channel} />;
 }

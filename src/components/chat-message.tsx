@@ -29,7 +29,13 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 	};
 
 	return (
-		<div className="w-full break-words py-0.5 text-lg">
+		<div className="w-full break-words text-lg">
+			{message.reply && (
+				<div className="relative top-0.5 text-sm text-muted-foreground">
+					Replying to <span className="font-medium">@{message.reply.login}</span>:{' '}
+					{message.reply.text}
+				</div>
+			)}
 			<span className="mr-2 text-muted-foreground">{formatTime(message.timestamp)}</span>
 
 			{message.badges.map((badge) => {

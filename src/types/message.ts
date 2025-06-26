@@ -10,6 +10,11 @@ export type ParsedMessage = {
 	login: string;
 	bestName: string;
 	message: string;
+	reply: null | {
+		login: string;
+		displayName: string;
+		text: string;
+	};
 	isAction: boolean;
 	color?: string;
 	badges: TwitchBadge[];

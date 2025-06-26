@@ -75,7 +75,7 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 						<Image
 							key={key}
 							alt={badge.type}
-							className="mr-1 inline-block align-baseline"
+							className="mr-1 inline-block overflow-hidden align-baseline"
 							height={16}
 							src={url}
 							title={badge.type}
@@ -90,6 +90,7 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 			</span>
 
 			<span
+				className="break-all"
 				style={{
 					color: message.type === 'PRIVMSG' && message.isAction ? message.color : undefined
 				}}

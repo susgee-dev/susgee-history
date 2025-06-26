@@ -43,7 +43,7 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 
 	const shouldShowBadges =
 		message.type !== MessageTypes.USERNOTICE ||
-		(message.type === MessageTypes.USERNOTICE && message.msgId !== 'submysterygift');
+		(message.type === MessageTypes.USERNOTICE && message.message !== '');
 
 	return (
 		<div

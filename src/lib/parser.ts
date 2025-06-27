@@ -246,11 +246,13 @@ export function processWithEmotes(
 	for (const word of words) {
 		const twitchEmote = parsed.emotes.find((emote) => {
 			const [start] = emote.slicePart.split('-').map(Number);
+
 			return start === currentPosition;
 		});
 
 		if (twitchEmote) {
 			const [start, end] = twitchEmote.slicePart.split('-').map(Number);
+
 			processedWords.push({
 				type: 'emote',
 				id: twitchEmote.emoteId,
@@ -258,8 +260,7 @@ export function processWithEmotes(
 				url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
 			});
 		} else {
-			const cleanWord = word.replace(/[^\w]/g, '').toLowerCase();
-			const sevenTvEmoteId = emoteMap.get(cleanWord);
+			const sevenTvEmoteId = emoteMap.get(word.toLowerCase());
 
 			if (sevenTvEmoteId) {
 				processedWords.push({

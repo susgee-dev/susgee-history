@@ -45,6 +45,7 @@ class SevenTV extends BaseApi {
 		}
 
 		const userByConnection = userResponse.data.users.userByConnection;
+
 		if (!userByConnection || !userByConnection.style || !userByConnection.style.activeEmoteSet) {
 			return null;
 		}

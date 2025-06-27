@@ -240,23 +240,30 @@ export function processWithEmotes(
 		emoteMap.set(emote.alias, emote.id);
 	});
 
+	const emotePositions = new Map<number, { emoteId: string; end: number; alias: string }>();
+
+	parsed.emotes.forEach((emote) => {
+		const positions = emote.slicePart.split(',');
+
+		positions.forEach((pos) => {
+			const [start, end] = pos.split('-').map(Number);
+			const alias = parsed.message.slice(start, end + 1);
+
+			emotePositions.set(start, { emoteId: emote.emoteId, end, alias });
+		});
+	});
+
 	let currentPosition = 0;
 	const words = parsed.message.split(' ');
 
 	for (const word of words) {
-		const twitchEmote = parsed.emotes.find((emote) => {
-			const [start] = emote.slicePart.split('-').map(Number);
-
-			return start === currentPosition;
-		});
+		const twitchEmote = emotePositions.get(currentPosition);
 
 		if (twitchEmote) {
-			const [start, end] = twitchEmote.slicePart.split('-').map(Number);
-
 			processedWords.push({
 				type: 'emote',
 				id: twitchEmote.emoteId,
-				alias: parsed.message.slice(start, end + 1),
+				alias: twitchEmote.alias,
 				url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
 			});
 		} else {

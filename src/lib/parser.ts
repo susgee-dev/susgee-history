@@ -260,7 +260,7 @@ export function processWithEmotes(
 				url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
 			});
 		} else {
-			const sevenTvEmoteId = emoteMap.get(word.toLowerCase());
+			const sevenTvEmoteId = emoteMap.get(word);
 
 			if (sevenTvEmoteId) {
 				processedWords.push({

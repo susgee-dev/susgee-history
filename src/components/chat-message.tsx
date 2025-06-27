@@ -107,13 +107,10 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 					{message.reply.text}
 				</div>
 			)}
-
 			{shouldShowSmallSystemMsg && (
 				<div className="relative top-0.5 text-sm text-muted-foreground">{message.systemMsg}</div>
 			)}
-
-			<span className="mr-2 text-muted-foreground">{formatTime(message.timestamp)}</span>
-
+			<span className="mr-1 text-muted-foreground">{formatTime(message.timestamp)} </span>
 			{shouldShowBadges &&
 				message.badges.map((badge) => {
 					const key = `${badge.type}_${badge.version}`;
@@ -124,7 +121,7 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 							key={key}
 							unoptimized
 							alt={badge.type}
-							className="mr-1 inline-block overflow-hidden align-baseline"
+							className="mr-1 inline-block select-none overflow-hidden align-baseline"
 							height={16}
 							loading="lazy"
 							src={url}
@@ -133,12 +130,10 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 						/>
 					) : null;
 				})}
-
-			<span className="mr-1 font-semibold" style={{ color: message.color }}>
+			<span className="font-semibold" style={{ color: message.color }}>
 				{message.bestName}
-				{message.type === 'PRIVMSG' && !message.isAction && ':'}
+				{message.type === 'PRIVMSG' && !message.isAction && ': '}
 			</span>
-
 			<span
 				className="break-all"
 				style={{

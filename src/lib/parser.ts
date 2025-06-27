@@ -237,7 +237,7 @@ export function processWithEmotes(
 	const emoteMap = new Map<string, string>();
 
 	sevenTvEmotes.forEach((emote) => {
-		emoteMap.set(emote.alias.toLowerCase(), emote.id);
+		emoteMap.set(emote.alias, emote.id);
 	});
 
 	let currentPosition = 0;

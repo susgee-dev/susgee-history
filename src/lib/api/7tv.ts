@@ -1,26 +1,25 @@
 import BaseApi from './base';
 
-import { SevenTVEmoteSetResponse } from '@/types/api/7tv';
+import { SevenTVEmote } from '@/types/api/7tv';
 
 class SevenTV extends BaseApi {
 	constructor() {
 		super('https://7tv.io/v4/gql');
 	}
 
-	async getUserEmoteSet(twitchId: string): Promise<SevenTVEmoteSetResponse | null> {
-		const userQuery = `{
+	async getChannelEmotes(twitchId: string): Promise<SevenTVEmote[]> {
+		const query = `{
 			users {
 				userByConnection(platform: TWITCH, platformId: "${twitchId}") {
-					id
 					style {
 						activeEmoteSet {
-							id
-							name
-							capacity
 							emotes {
 								items {
 									id
 									alias
+									emote {
+										aspectRatio
+									}		
 								}
 							}
 						}
@@ -29,30 +28,14 @@ class SevenTV extends BaseApi {
 			}
 		}`;
 
-		const userResponse = await super.fetch<any>('', {
-			body: JSON.stringify({
-				query: userQuery,
-				variables: { id: twitchId }
-			}),
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			method: 'POST'
+		const response = await super.fetch<any>('', {
+			method: 'POST',
+			body: JSON.stringify({ query })
 		});
 
-		if (!userResponse || !userResponse.data || !userResponse.data.users) {
-			return null;
-		}
+		const emotes = response.data.users.userByConnection?.style?.activeEmoteSet?.emotes?.items;
 
-		const userByConnection = userResponse.data.users.userByConnection;
-
-		if (!userByConnection || !userByConnection.style || !userByConnection.style.activeEmoteSet) {
-			return null;
-		}
-
-		return {
-			emote_set: userByConnection.style.activeEmoteSet.emotes
-		};
+		return emotes || [];
 	}
 }
 

@@ -26,7 +26,7 @@ export type BaseMessage = {
 
 export type ProcessedWord =
 	| { type: 'text'; content: string }
-	| { type: 'emote'; id: string; alias: string; url: string };
+	| { type: 'emote'; id: string; alias: string; url: string; aspectRatio: number };
 
 export type Emote = {
 	emoteId: string;

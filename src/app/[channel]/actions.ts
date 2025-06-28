@@ -17,14 +17,12 @@ export async function fetchChannelData(channel: string) {
 		throw new Error('Channel not found');
 	}
 
-	const [messages, globalBadges, channelBadges, emoteSet] = await Promise.all([
+	const [messages, globalBadges, channelBadges, emotes] = await Promise.all([
 		recentMessages.get(channel),
 		helix.getGlobalBadges(),
 		helix.getChannelBadges(channelId),
-		sevenTV.getUserEmoteSet(channelId)
+		sevenTV.getChannelEmotes(channelId)
 	]);
-
-	const emotes = emoteSet?.emote_set?.items || [];
 
 	const parsed =
 		messages

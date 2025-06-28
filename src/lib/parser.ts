@@ -1,5 +1,6 @@
 import logger from '@/lib/logger';
 import { getBestName } from '@/lib/utils';
+import { SevenTVEmote } from '@/types/api/7tv';
 import {
 	BaseMessage,
 	Emote,
@@ -213,10 +214,13 @@ class Parser {
 	private parseEmotes(emotesStr: string): Emote[] {
 		if (!emotesStr) return [];
 
-		return emotesStr.split('/').map((emoteStr) => {
-			const [emoteId, slicePart] = emoteStr.split(':');
+		return emotesStr.split('/').flatMap((emoteStr) => {
+			const [emoteId, sliceParts] = emoteStr.split(':');
 
-			return { emoteId, slicePart };
+			return sliceParts.split(',').map((slicePart) => ({
+				emoteId,
+				slicePart
+			}));
 		});
 	}
 }
@@ -227,54 +231,49 @@ export default parser;
 
 export function processWithEmotes(
 	message: string,
-	sevenTvEmotes: Array<{ id: string; alias: string }>
+	sevenTvEmotes: SevenTVEmote[]
 ): ParsedMessage | null {
 	const parsed = parser.process(message);
 
 	if (!parsed) return null;
 
 	const processedWords: ProcessedWord[] = [];
-	const emoteMap = new Map<string, string>();
+	const emoteMap = new Map<string, { id: string; aspectRatio: number }>();
 
 	sevenTvEmotes.forEach((emote) => {
-		emoteMap.set(emote.alias, emote.id);
-	});
-
-	const emotePositions = new Map<number, { emoteId: string; end: number; alias: string }>();
-
-	parsed.emotes.forEach((emote) => {
-		const positions = emote.slicePart.split(',');
-
-		positions.forEach((pos) => {
-			const [start, end] = pos.split('-').map(Number);
-			const alias = parsed.message.slice(start, end + 1);
-
-			emotePositions.set(start, { emoteId: emote.emoteId, end, alias });
-		});
+		emoteMap.set(emote.alias, { id: emote.id, aspectRatio: emote.emote.aspectRatio });
 	});
 
 	let currentPosition = 0;
 	const words = parsed.message.split(' ');
 
 	for (const word of words) {
-		const twitchEmote = emotePositions.get(currentPosition);
+		const twitchEmote = parsed.emotes.find((emote) => {
+			const [start] = emote.slicePart.split('-').map(Number);
+
+			return start === currentPosition;
+		});
 
 		if (twitchEmote) {
+			const [start, end] = twitchEmote.slicePart.split('-').map(Number);
+
 			processedWords.push({
 				type: 'emote',
 				id: twitchEmote.emoteId,
-				alias: twitchEmote.alias,
+				alias: parsed.message.slice(start, end + 1),
+				aspectRatio: 1,
 				url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
 			});
 		} else {
-			const sevenTvEmoteId = emoteMap.get(word);
+			const emote = emoteMap.get(word);
 
-			if (sevenTvEmoteId) {
+			if (emote) {
 				processedWords.push({
 					type: 'emote',
-					id: sevenTvEmoteId,
+					id: emote.id,
 					alias: word,
-					url: `https://cdn.7tv.app/emote/${sevenTvEmoteId}/1x.avif`
+					aspectRatio: emote.aspectRatio || 1,
+					url: `https://cdn.7tv.app/emote/${emote.id}/1x.webp`
 				});
 			} else {
 				processedWords.push({

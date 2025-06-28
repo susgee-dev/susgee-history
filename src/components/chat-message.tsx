@@ -2,47 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
 
+import EmoteImage from '@/components/fragments/emote';
 import { cn, formatTime } from '@/lib/utils';
 import { ChatMessageProps, MessageTypes, ProcessedWord } from '@/types/message';
-
-function EmoteImage({ src, alt, title }: { src: string; alt: string; title: string }) {
-	const [isLoading, setIsLoading] = useState(true);
-	const [hasError, setHasError] = useState(false);
-
-	if (hasError) {
-		return (
-			<span className="inline-block flex h-7 w-7 items-center justify-center rounded bg-gray-300 text-xs text-gray-600">
-				{alt}
-			</span>
-		);
-	}
-
-	return (
-		<div className="relative inline-block">
-			{isLoading && <div className="h-7 w-7 animate-pulse rounded bg-gray-200" />}
-			<Image
-				unoptimized
-				alt={alt}
-				className={cn(
-					'mx-0.5 inline-block align-middle transition-opacity duration-200',
-					isLoading ? 'opacity-0' : 'opacity-100'
-				)}
-				height={28}
-				loading="lazy"
-				src={src}
-				title={title}
-				width={28}
-				onError={() => {
-					setIsLoading(false);
-					setHasError(true);
-				}}
-				onLoad={() => setIsLoading(false)}
-			/>
-		</div>
-	);
-}
 
 export default function ChatMessage({ message, badges }: ChatMessageProps) {
 	const renderMessageWithLinks = (text: string = '') => {
@@ -71,10 +34,18 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 	const renderProcessedContent = (content: ProcessedWord[]) => {
 		return content.map((word, index) => {
 			if (word.type === 'emote') {
-				return <EmoteImage key={index} alt={word.alias} src={word.url} title={word.alias} />;
+				return (
+					<EmoteImage
+						key={index}
+						alt={word.alias}
+						aspectRatio={word.aspectRatio}
+						src={word.url}
+						title={word.alias}
+					/>
+				);
 			}
 
-			return <span key={index}>{word.content} </span>;
+			return `${word.content} `;
 		});
 	};
 
@@ -98,10 +69,10 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 			className={cn(
 				'w-full break-words px-1 text-lg/6',
 				message.isFirstMessage ? 'bg-green-500/20' : '',
-				message.type === 'USERNOTICE' ? 'bg-purple-500/20 py-1' : ''
+				message.type === MessageTypes.USERNOTICE ? 'bg-purple-500/20 py-1' : ''
 			)}
 		>
-			{message.type === 'PRIVMSG' && message.reply && (
+			{message.type === MessageTypes.PRIVMSG && message.reply && (
 				<div className="relative top-0.5 text-sm text-muted-foreground">
 					Replying to <span className="font-medium">@{message.reply.login}</span>:{' '}
 					{message.reply.text}
@@ -110,7 +81,9 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 			{shouldShowSmallSystemMsg && (
 				<div className="relative top-0.5 text-sm text-muted-foreground">{message.systemMsg}</div>
 			)}
-			<span className="mr-1 text-muted-foreground">{formatTime(message.timestamp)} </span>
+			<span className="mr-1 font-mono text-sm text-muted-foreground">
+				{formatTime(message.timestamp)}{' '}
+			</span>
 			{shouldShowBadges &&
 				message.badges.map((badge) => {
 					const key = `${badge.type}_${badge.version}`;
@@ -132,15 +105,16 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 				})}
 			<span className="font-semibold" style={{ color: message.color }}>
 				{message.bestName}
-				{message.type === 'PRIVMSG' && !message.isAction && ': '}
+				{message.type === MessageTypes.PRIVMSG && !message.isAction && ':'}{' '}
 			</span>
 			<span
-				className="break-all"
+				className="break-word"
 				style={{
-					color: message.type === 'PRIVMSG' && message.isAction ? message.color : undefined
+					color:
+						message.type === MessageTypes.PRIVMSG && message.isAction ? message.color : undefined
 				}}
 			>
-				{message.type === 'USERNOTICE' && (!message.message || message.msgId !== 'resub')
+				{message.type === MessageTypes.USERNOTICE && (!message.message || message.msgId !== 'resub')
 					? processSystemMsg(message.systemMsg, message.message)
 					: message.processedContent
 						? renderProcessedContent(message.processedContent)

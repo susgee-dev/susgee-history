@@ -9,6 +9,7 @@ html {
 
 .break-word {
   word-break: break-word;
+  hyphens: auto;
 }
 
 .gradient-text {

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { Outfit } from 'next/font/google';
+import { Outfit as Font } from 'next/font/google';
 import Script from 'next/script';
 import React from 'react';
 
@@ -17,13 +17,13 @@ export const metadata: Metadata = {
 	}
 };
 
-const outfit = Outfit({
+const font = Font({
 	subsets: ['latin']
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<html suppressHydrationWarning className={`${outfit.className} dark`} lang="en">
+		<html suppressHydrationWarning className={`${font.className} dark`} lang="en">
 			<body className="flex min-h-screen flex-col bg-gradient-bg bg-fixed text-font">
 				<main className="mx-auto w-full max-w-[35rem] flex-1 p-4">{children}</main>
 				<Footer />

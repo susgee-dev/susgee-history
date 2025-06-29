@@ -1,6 +1,7 @@
 import logger from '@/lib/logger';
 import { getBestName } from '@/lib/utils';
 import { SevenTVEmote } from '@/types/api/7tv';
+import { GlobalEmotesMap } from '@/types/api/helix';
 import {
 	BaseMessage,
 	Emote,
@@ -231,17 +232,25 @@ export default parser;
 
 export function processWithEmotes(
 	message: string,
-	sevenTvEmotes: SevenTVEmote[]
+	channelEmotes: SevenTVEmote[],
+	globalSevenTVEmotes: SevenTVEmote[],
+	globalTwitchEmotes?: GlobalEmotesMap
 ): ParsedMessage | null {
 	const parsed = parser.process(message);
 
 	if (!parsed) return null;
 
 	const processedWords: ProcessedWord[] = [];
-	const emoteMap = new Map<string, { id: string; aspectRatio: number }>();
+	
+	const channelEmoteMap = new Map<string, { id: string; aspectRatio: number }>();
+	const globalEmoteMap = new Map<string, { id: string; aspectRatio: number }>();
 
-	sevenTvEmotes.forEach((emote) => {
-		emoteMap.set(emote.alias, { id: emote.id, aspectRatio: emote.emote.aspectRatio });
+	channelEmotes.forEach((emote) => {
+		channelEmoteMap.set(emote.alias, { id: emote.id, aspectRatio: emote.emote.aspectRatio });
+	});
+
+	globalSevenTVEmotes.forEach((emote) => {
+		globalEmoteMap.set(emote.alias, { id: emote.id, aspectRatio: emote.emote.aspectRatio });
 	});
 
 	let currentPosition = 0;
@@ -265,21 +274,42 @@ export function processWithEmotes(
 				url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
 			});
 		} else {
-			const emote = emoteMap.get(word);
+			const channelEmote = channelEmoteMap.get(word);
 
-			if (emote) {
+			if (channelEmote) {
 				processedWords.push({
 					type: 'emote',
-					id: emote.id,
+					id: channelEmote.id,
 					alias: word,
-					aspectRatio: emote.aspectRatio || 1,
-					url: `https://cdn.7tv.app/emote/${emote.id}/1x.webp`
+					aspectRatio: channelEmote.aspectRatio || 1,
+					url: `https://cdn.7tv.app/emote/${channelEmote.id}/1x.webp`
 				});
 			} else {
-				processedWords.push({
-					type: 'text',
-					content: word + ' '
-				});
+				const globalEmote = globalEmoteMap.get(word);
+
+				if (globalEmote) {
+					processedWords.push({
+						type: 'emote',
+						id: globalEmote.id,
+						alias: word,
+						aspectRatio: globalEmote.aspectRatio || 1,
+						url: `https://cdn.7tv.app/emote/${globalEmote.id}/1x.webp`
+					});
+				} else if (globalTwitchEmotes && globalTwitchEmotes[word]) {
+					const globalTwitchEmote = globalTwitchEmotes[word];
+					processedWords.push({
+						type: 'emote',
+						id: globalTwitchEmote.id,
+						alias: word,
+						aspectRatio: 1,
+						url: globalTwitchEmote.url
+					});
+				} else {
+					processedWords.push({
+						type: 'text',
+						content: word + ' '
+					});
+				}
 			}
 		}
 

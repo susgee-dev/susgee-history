@@ -4,8 +4,10 @@ import BaseApi from './base';
 
 import {
 	GlobalBadgesMap,
+	GlobalEmotesMap,
 	TwitchBadgesResponse,
 	TwitchBadgeVersion,
+	TwitchEmotesResponse,
 	UserResponse
 } from '@/types/api/helix';
 
@@ -65,6 +67,29 @@ class Helix extends BaseApi {
 				if (version?.id && version.image_url_2x) {
 					result[`${set.set_id}_${version.id}`] = version.image_url_2x;
 				}
+			}
+		}
+
+		return result;
+	}
+
+	async getGlobalEmotes(): Promise<GlobalEmotesMap> {
+		const response = await super.fetch<TwitchEmotesResponse>('/chat/emotes/global', {
+			headers: this.headers
+		});
+
+		if (!response) {
+			return {};
+		}
+
+		const result: GlobalEmotesMap = {};
+
+		for (const emote of response.data) {
+			if (emote?.id && emote?.name && emote?.images?.url_2x) {
+				result[emote.name] = {
+					id: emote.id,
+					url: emote.images.url_2x
+				};
 			}
 		}
 

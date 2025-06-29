@@ -59,9 +59,10 @@ class SevenTV extends BaseApi {
 	}
 
 	async getGlobalEmotes(): Promise<SevenTVEmote[]> {
-		const globalEmoteSetResponse = await this.fetchExternal<any>('https://7tv.io/v3/emote-sets/global');
-		console.log(globalEmoteSetResponse)
-		
+		const globalEmoteSetResponse = await this.fetchExternal<any>(
+			'https://7tv.io/v3/emote-sets/global'
+		);
+
 		if (!globalEmoteSetResponse || !globalEmoteSetResponse.id) {
 			return [];
 		}

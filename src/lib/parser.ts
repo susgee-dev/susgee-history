@@ -241,7 +241,7 @@ export function processWithEmotes(
 	if (!parsed) return null;
 
 	const processedWords: ProcessedWord[] = [];
-	
+
 	const channelEmoteMap = new Map<string, { id: string; aspectRatio: number }>();
 	const globalEmoteMap = new Map<string, { id: string; aspectRatio: number }>();
 
@@ -297,6 +297,7 @@ export function processWithEmotes(
 					});
 				} else if (globalTwitchEmotes && globalTwitchEmotes[word]) {
 					const globalTwitchEmote = globalTwitchEmotes[word];
+
 					processedWords.push({
 						type: 'emote',
 						id: globalTwitchEmote.id,

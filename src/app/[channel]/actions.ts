@@ -17,7 +17,14 @@ export async function fetchChannelData(channel: string) {
 		throw new Error('Channel not found');
 	}
 
-	const [messages, globalBadges, channelBadges, globalTwitchEmotes, globalSevenTVEmotes, channelEmotes] = await Promise.all([
+	const [
+		messages,
+		globalBadges,
+		channelBadges,
+		globalTwitchEmotes,
+		globalSevenTVEmotes,
+		channelEmotes
+	] = await Promise.all([
 		recentMessages.get(channel),
 		helix.getGlobalBadges(),
 		helix.getChannelBadges(channelId),
@@ -26,10 +33,11 @@ export async function fetchChannelData(channel: string) {
 		sevenTV.getChannelEmotes(channelId)
 	]);
 
-
 	const parsed =
 		messages
-			?.map((msg: string) => processWithEmotes(msg, channelEmotes, globalSevenTVEmotes, globalTwitchEmotes))
+			?.map((msg: string) =>
+				processWithEmotes(msg, channelEmotes, globalSevenTVEmotes, globalTwitchEmotes)
+			)
 			?.filter((msg): msg is ParsedMessage => !!msg)
 			.reverse() || [];
 

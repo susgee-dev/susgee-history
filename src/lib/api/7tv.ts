@@ -72,10 +72,6 @@ class SevenTV extends BaseApi {
 		const query = `{
 			emoteSets {
 				emoteSet(id: "${globalEmoteSetId}") {
-					ownerId
-					id
-					name
-					capacity
 					emotes {
 						items {
 							id

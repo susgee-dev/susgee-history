@@ -8,9 +8,7 @@ export type User = {
 	display_name: string;
 };
 
-export type GlobalBadgesMap = {
-	[badgeId: string]: string;
-};
+export type BadgeMap = Map<string, string>;
 
 export type TwitchBadgeVersion = {
 	id: string;

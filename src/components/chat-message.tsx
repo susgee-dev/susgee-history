@@ -1,56 +1,51 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 
 import EmoteImage from '@/components/fragments/emote';
+import { Link } from '@/components/ui/link';
 import { cn, formatTime } from '@/lib/utils';
-import { ChatMessageProps, MessageTypes, ProcessedWord } from '@/types/message';
+import { ChatMessageProps, MessageTypes, ParsedPrivMsg, ProcessedWord } from '@/types/message';
 
-export default function ChatMessage({ message, badges }: ChatMessageProps) {
-	const renderMessageWithLinks = (text: string = '') => {
-		if (!text) return '';
-
-		const urlRegex = /(https?:\/\/\S+)/g;
-		const parts = text.split(urlRegex);
-
-		return parts.map((part, index) =>
-			urlRegex.test(part) ? (
-				<Link
-					key={index}
-					className="text-blue-500 underline hover:text-blue-700"
-					href={part}
-					rel="noopener noreferrer"
-					target="_blank"
-				>
-					{part}
-				</Link>
-			) : (
-				part
-			)
-		);
-	};
-
+export default function ChatMessage({ message }: ChatMessageProps) {
 	const renderProcessedContent = (content: ProcessedWord[]) => {
 		return content.map((word, index) => {
-			if (word.type === 'emote') {
-				return (
-					<EmoteImage
-						key={index}
-						alt={word.alias}
-						aspectRatio={word.aspectRatio}
-						src={word.url}
-						title={word.alias}
-					/>
-				);
-			}
+			switch (word.type) {
+				case 'emote': {
+					return (
+						<EmoteImage
+							key={index}
+							alt={word.content}
+							aspectRatio={word.aspectRatio}
+							src={word.url}
+							title={word.content}
+						/>
+					);
+				}
 
-			return `${word.content} `;
+				case 'link': {
+					return (
+						<Link
+							key={index}
+							className="text-primary"
+							href={word.url}
+							target="_blank"
+							title={word.content}
+						>
+							{word.content}
+						</Link>
+					);
+				}
+
+				default: {
+					return `${word.content} `;
+				}
+			}
 		});
 	};
 
-	const processSystemMsg = (msg: string, text: string) => {
-		if (text === '') {
+	const processSystemMsg = (msg: string, text: string[]) => {
+		if (!text.length) {
 			return msg.split(' ').slice(1).join(' ');
 		}
 
@@ -58,11 +53,11 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 	};
 
 	const shouldShowSmallSystemMsg =
-		message.type === MessageTypes.USERNOTICE && message.message && message.msgId === 'resub';
+		message.type === MessageTypes.USERNOTICE && message.text && message.msgId === 'resub';
 
 	const shouldShowBadges =
 		message.type !== MessageTypes.USERNOTICE ||
-		(message.type === MessageTypes.USERNOTICE && message.message !== '');
+		(message.type === MessageTypes.USERNOTICE && !message.text.length);
 
 	return (
 		<div
@@ -85,23 +80,20 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 				{formatTime(message.timestamp)}{' '}
 			</span>
 			{shouldShowBadges &&
-				message.badges.map((badge) => {
-					const key = `${badge.type}_${badge.version}`;
-					const url = badges[key] ?? badges[badge.version ?? ''];
-
-					return url ? (
+				message.badges.map((badge, index) => {
+					return (
 						<Image
-							key={key}
+							key={`badge-${index}`}
 							unoptimized
-							alt={badge.type}
+							alt={badge.content}
 							className="mr-1 inline-block select-none overflow-hidden align-baseline"
 							height={16}
 							loading="lazy"
-							src={url}
-							title={badge.type}
+							src={badge.url}
+							title={badge.content}
 							width={16}
 						/>
-					) : null;
+					);
 				})}
 			<span className="font-semibold" style={{ color: message.color }}>
 				{message.bestName}
@@ -114,11 +106,9 @@ export default function ChatMessage({ message, badges }: ChatMessageProps) {
 						message.type === MessageTypes.PRIVMSG && message.isAction ? message.color : undefined
 				}}
 			>
-				{message.type === MessageTypes.USERNOTICE && (!message.message || message.msgId !== 'resub')
-					? processSystemMsg(message.systemMsg, message.message)
-					: message.processedContent
-						? renderProcessedContent(message.processedContent)
-						: renderMessageWithLinks(message.message)}
+				{message.type === MessageTypes.USERNOTICE && (!message.text || message.msgId !== 'resub')
+					? processSystemMsg(message.systemMsg, message.text)
+					: renderProcessedContent((message as ParsedPrivMsg).text)}
 			</span>
 		</div>
 	);

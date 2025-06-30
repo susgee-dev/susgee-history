@@ -1,38 +1,33 @@
 import BaseApi from './base';
 
-import { SevenTVEmote } from '@/types/api/7tv';
+import { SevenTVEmoteMap } from '@/types/api/7tv';
 
 class SevenTV extends BaseApi {
+	private globalEmoteSetId: string = '01HKQT8EWR000ESSWF3625XCS4';
+
 	constructor() {
 		super('https://7tv.io/v4/gql');
 	}
 
-	private async fetchExternal<T>(url: string): Promise<null | T> {
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: {
-				'User-Agent': 'Susgeebot History (https://github.com/susgee-dev/susgee-history)',
-				'Content-Type': 'application/json'
-			}
-		});
-
-		if (!response.ok) {
-			return null;
-		}
-
-		if (response.status === 204) {
-			return null;
-		}
-
-		return await response.json();
-	}
-
-	async getChannelEmotes(twitchId: string): Promise<SevenTVEmote[]> {
+	async getEmotes(twitchId: string): Promise<SevenTVEmoteMap> {
 		const query = `{
-			users {
-				userByConnection(platform: TWITCH, platformId: "${twitchId}") {
-					style {
-						activeEmoteSet {
+			emoteSets {
+				emoteSet (id: "${this.globalEmoteSetId}") {
+					emotes {
+						items {
+							id
+							alias
+							emote {
+								aspectRatio
+							}
+						}
+					}
+			}		
+		}
+		users {
+			userByConnection(platform: TWITCH, platformId: "${twitchId}") {
+				style {
+					activeEmoteSet {
 							emotes {
 								items {
 									id
@@ -46,53 +41,34 @@ class SevenTV extends BaseApi {
 					}
 				}
 			}
-		}`;
+    }`;
 
 		const response = await super.fetch<any>('', {
 			method: 'POST',
 			body: JSON.stringify({ query })
 		});
 
-		const emotes = response.data.users.userByConnection?.style?.activeEmoteSet?.emotes?.items;
+		const data = response?.data;
 
-		return emotes || [];
-	}
+		const emotes: SevenTVEmoteMap = new Map();
 
-	async getGlobalEmotes(): Promise<SevenTVEmote[]> {
-		const globalEmoteSetResponse = await this.fetchExternal<any>(
-			'https://7tv.io/v3/emote-sets/global'
-		);
-
-		if (!globalEmoteSetResponse || !globalEmoteSetResponse.id) {
-			return [];
+		for (const item of data?.emoteSets?.emoteSet?.emotes?.items) {
+			emotes.set(item.alias, {
+				id: item.id,
+				name: item.alias,
+				aspectRatio: item.emote.aspectRatio
+			});
 		}
 
-		const globalEmoteSetId = globalEmoteSetResponse.id;
+		for (const item of data?.users?.userByConnection?.style?.activeEmoteSet?.emotes?.items) {
+			emotes.set(item.alias, {
+				id: item.id,
+				name: item.alias,
+				aspectRatio: item.emote.aspectRatio
+			});
+		}
 
-		const query = `{
-			emoteSets {
-				emoteSet(id: "${globalEmoteSetId}") {
-					emotes {
-						items {
-							id
-							alias
-							emote {
-								aspectRatio
-							}
-						}
-					}
-				}
-			}
-		}`;
-
-		const response = await super.fetch<any>('', {
-			method: 'POST',
-			body: JSON.stringify({ query })
-		});
-
-		const emotes = response.data.emoteSets.emoteSet?.emotes?.items;
-
-		return emotes || [];
+		return emotes;
 	}
 }
 

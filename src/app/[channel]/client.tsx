@@ -12,17 +12,15 @@ import { ParsedMessage } from '@/types/message';
 
 export default function ChannelPageClient({ channel }: { channel: string }) {
 	const [parsed, setParsed] = useState<ParsedMessage[]>([]);
-	const [badges, setBadges] = useState<Record<string, string>>({});
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		async function loadChannelData() {
 			try {
-				const { messages, badges } = await fetchChannelData(channel);
+				const messages = await fetchChannelData(channel);
 
 				setParsed(messages);
-				setBadges(badges);
 			} catch {
 				setError('an unknown error occurred');
 			} finally {
@@ -64,7 +62,7 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 			) : (
 				<div className="flex flex-col gap-1">
 					{parsed.map((msg) => (
-						<ChatMessage key={msg.id} badges={badges} message={msg} />
+						<ChatMessage key={msg.id} message={msg} />
 					))}
 				</div>
 			)}

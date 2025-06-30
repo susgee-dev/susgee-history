@@ -3,11 +3,9 @@ import 'dotenv/config';
 import BaseApi from './base';
 
 import {
-	GlobalBadgesMap,
-	GlobalEmotesMap,
+	BadgeMap,
 	TwitchBadgesResponse,
 	TwitchBadgeVersion,
-	TwitchEmotesResponse,
 	UserResponse
 } from '@/types/api/helix';
 
@@ -30,7 +28,7 @@ class Helix extends BaseApi {
 		return channels?.data?.[0]?.id || null;
 	}
 
-	async getChannelBadges(channelId: string): Promise<GlobalBadgesMap> {
+	async getChannelBadges(channelId: string): Promise<BadgeMap> {
 		const response = await super.fetch<TwitchBadgesResponse>(
 			`/chat/badges?broadcaster_id=${channelId}`,
 			{
@@ -38,12 +36,12 @@ class Helix extends BaseApi {
 			}
 		);
 
-		const result: GlobalBadgesMap = {};
+		const result: BadgeMap = new Map();
 
-		for (const set of (response as TwitchBadgesResponse).data) {
+		for (const set of response?.data || []) {
 			for (const version of Object.values(set.versions) as TwitchBadgeVersion[]) {
 				if (version?.id && version.image_url_2x) {
-					result[`${set.set_id}_${version.id}`] = version.image_url_2x;
+					result.set(`${set.set_id}_${version.id}`, version.image_url_2x);
 				}
 			}
 		}
@@ -51,45 +49,18 @@ class Helix extends BaseApi {
 		return result;
 	}
 
-	async getGlobalBadges(): Promise<GlobalBadgesMap> {
+	async getGlobalBadges(): Promise<BadgeMap> {
 		const response = await super.fetch<TwitchBadgesResponse>('/chat/badges/global', {
 			headers: this.headers
 		});
 
-		if (!response) {
-			return {};
-		}
+		const result: BadgeMap = new Map();
 
-		const result: GlobalBadgesMap = {};
-
-		for (const set of response.data) {
+		for (const set of response?.data || []) {
 			for (const version of Object.values(set.versions) as TwitchBadgeVersion[]) {
 				if (version?.id && version.image_url_2x) {
-					result[`${set.set_id}_${version.id}`] = version.image_url_2x;
+					result.set(`${set.set_id}_${version.id}`, version.image_url_2x);
 				}
-			}
-		}
-
-		return result;
-	}
-
-	async getGlobalEmotes(): Promise<GlobalEmotesMap> {
-		const response = await super.fetch<TwitchEmotesResponse>('/chat/emotes/global', {
-			headers: this.headers
-		});
-
-		if (!response) {
-			return {};
-		}
-
-		const result: GlobalEmotesMap = {};
-
-		for (const emote of response.data) {
-			if (emote?.id && emote?.name && emote?.images?.url_2x) {
-				result[emote.name] = {
-					id: emote.id,
-					url: emote.images.url_2x
-				};
 			}
 		}
 

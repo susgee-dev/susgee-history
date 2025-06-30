@@ -1,7 +1,7 @@
 export type SevenTVEmote = {
 	id: string;
-	alias: string;
-	emote: {
-		aspectRatio: number;
-	};
+	name: string;
+	aspectRatio: number;
 };
+
+export type SevenTVEmoteMap = Map<string, SevenTVEmote>;

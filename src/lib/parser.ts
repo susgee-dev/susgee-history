@@ -1,9 +1,8 @@
 import logger from '@/lib/logger';
 import { getBestName } from '@/lib/utils';
-import { SevenTVEmote } from '@/types/api/7tv';
-import { GlobalEmotesMap } from '@/types/api/helix';
 import {
 	BaseMessage,
+	Cosmetics,
 	Emote,
 	MessageTypes,
 	ParsedMessage,
@@ -14,15 +13,14 @@ import {
 } from '@/types/message';
 
 class Parser {
-	private badgeCache = new Map<string, TwitchBadge>();
 	private fallbackColor = '#808080';
 
-	process(rawMessage: string): ParsedMessage | null {
+	process(rawMessage: string, cosmetics: Cosmetics): ParsedMessage | null {
 		try {
 			const privMsgSplitIndex = rawMessage.indexOf(' PRIVMSG ');
 
 			if (privMsgSplitIndex !== -1) {
-				return this.processPrivMsg(rawMessage, privMsgSplitIndex);
+				return this.processPrivMsg(rawMessage, privMsgSplitIndex, cosmetics);
 			}
 
 			const userNoticeSplitIndex = rawMessage.indexOf(' USERNOTICE ');
@@ -39,7 +37,11 @@ class Parser {
 		}
 	}
 
-	private processPrivMsg(rawMessage: string, msgSplitIndex: number): ParsedPrivMsg | null {
+	private processPrivMsg(
+		rawMessage: string,
+		msgSplitIndex: number,
+		cosmetics: any
+	): ParsedPrivMsg | null {
 		try {
 			const prefixAndTags = rawMessage.substring(0, msgSplitIndex);
 			const tagsPart = prefixAndTags.startsWith('@') ? prefixAndTags.split(' ')[0] : '';
@@ -77,20 +79,21 @@ class Parser {
 				};
 			}
 
-			if (reply && messageContent.startsWith('@')) {
-				const spaceIndex = messageContent.indexOf(' ');
+			const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics);
 
-				if (spaceIndex !== -1) {
-					messageContent = messageContent.slice(spaceIndex + 1).trim();
-				}
+			cosmetics.twitch.emotes = baseMessage.emotes;
+
+			const processedMessage = this.processText(messageContent, cosmetics);
+
+			// remove @user if it's a reply
+			if (reply && processedMessage[0]?.content?.startsWith('@')) {
+				processedMessage.shift();
 			}
-
-			const baseMessage = this.createBaseMessage(tags, login, displayName);
 
 			return {
 				...baseMessage,
 				type: MessageTypes.PRIVMSG,
-				message: messageContent,
+				text: processedMessage,
 				isAction,
 				reply
 			};
@@ -99,6 +102,66 @@ class Parser {
 
 			return null;
 		}
+	}
+
+	private processText(message: string, cosmetics: Cosmetics): ProcessedWord[] {
+		if (!message) return [];
+
+		const processedWords: ProcessedWord[] = [];
+
+		const twitchEmotes = cosmetics.twitch.emotes || [];
+		const stvEmotes = cosmetics.sevenTv.emotes;
+
+		const words = message.split(' ');
+		let currentMessageIndex = 0;
+
+		for (const word of words) {
+			const twitchEmote = twitchEmotes.find((emote) => emote.start === currentMessageIndex);
+
+			if (twitchEmote) {
+				processedWords.push({
+					type: 'emote',
+					id: twitchEmote.emoteId,
+					content: word,
+					aspectRatio: 1,
+					url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
+				});
+
+				currentMessageIndex += word.length + 1;
+				continue;
+			}
+
+			const stvEmote = stvEmotes.get(word);
+
+			if (stvEmote) {
+				processedWords.push({
+					type: 'emote',
+					id: stvEmote.id,
+					content: stvEmote.name,
+					aspectRatio: stvEmote.aspectRatio,
+					url: `https://cdn.7tv.app/emote/${stvEmote.id}/1x.webp`
+				});
+
+				currentMessageIndex += word.length + 1;
+				continue;
+			}
+
+			if (/^https?:\/\//.test(word)) {
+				processedWords.push({
+					type: 'link',
+					content: word,
+					url: word
+				});
+
+				currentMessageIndex += word.length + 1;
+				continue;
+			}
+
+			currentMessageIndex += word.length + 1;
+			processedWords.push({ type: 'text', content: word });
+		}
+
+		return processedWords;
 	}
 
 	private processUserNotice(rawMessage: string, msgSplitIndex: number): ParsedUserNotice | null {
@@ -134,7 +197,7 @@ class Parser {
 			return {
 				...baseMessage,
 				type: MessageTypes.USERNOTICE,
-				message: messageContent,
+				text: messageContent.split(' ').filter(Boolean),
 				msgId,
 				systemMsg,
 				msgParams
@@ -149,7 +212,8 @@ class Parser {
 	private createBaseMessage(
 		tags: Map<string, string>,
 		login: string,
-		displayName: string
+		displayName: string,
+		cosmetics?: Cosmetics
 	): BaseMessage {
 		return {
 			id: tags.get('id') || '',
@@ -158,7 +222,7 @@ class Parser {
 			login,
 			bestName: getBestName(displayName, login),
 			color: tags.get('color') || this.fallbackColor,
-			badges: this.parseBadges(tags.get('badges') || ''),
+			badges: this.parseBadges(tags.get('badges') || '', cosmetics),
 			emotes: this.parseEmotes(tags.get('emotes') || ''),
 			roles: this.parseRoles(tags),
 			isVip: tags.get('vip') === '1',
@@ -184,21 +248,24 @@ class Parser {
 		return tagsMap;
 	}
 
-	private parseBadges(badgesStr: string): TwitchBadge[] {
-		if (!badgesStr) return [];
+	private parseBadges(badgesStr: string, cosmetics?: Cosmetics): TwitchBadge[] {
+		if (!badgesStr || !cosmetics) return [];
 
-		return badgesStr.split(',').map((badgeStr) => {
-			const [type, version] = badgeStr.split('/');
-			const cacheKey = `${type}-${version}`;
+		return badgesStr
+			.split(',')
+			.map((badgeStr) => {
+				const [type, version] = badgeStr.split('/');
+				const badgeKey = `${type}_${version}`;
+				const url = cosmetics.twitch.badges.get(badgeKey);
 
-			if (this.badgeCache.has(cacheKey)) return this.badgeCache.get(cacheKey)!;
+				if (!url) return;
 
-			const badge = { type, version };
-
-			this.badgeCache.set(cacheKey, badge);
-
-			return badge;
-		});
+				return {
+					content: type,
+					url
+				};
+			})
+			.filter((badge): badge is TwitchBadge => badge !== null);
 	}
 
 	private parseRoles(tags: Map<string, string>): string[] {
@@ -218,10 +285,15 @@ class Parser {
 		return emotesStr.split('/').flatMap((emoteStr) => {
 			const [emoteId, sliceParts] = emoteStr.split(':');
 
-			return sliceParts.split(',').map((slicePart) => ({
-				emoteId,
-				slicePart
-			}));
+			return sliceParts.split(',').map((slicePart) => {
+				const [start, end] = slicePart.split('-').map(Number);
+
+				return {
+					emoteId,
+					start,
+					end
+				};
+			});
 		});
 	}
 }
@@ -229,96 +301,3 @@ class Parser {
 const parser = new Parser();
 
 export default parser;
-
-export function processWithEmotes(
-	message: string,
-	channelEmotes: SevenTVEmote[],
-	globalSevenTVEmotes: SevenTVEmote[],
-	globalTwitchEmotes?: GlobalEmotesMap
-): ParsedMessage | null {
-	const parsed = parser.process(message);
-
-	if (!parsed) return null;
-
-	const processedWords: ProcessedWord[] = [];
-
-	const channelEmoteMap = new Map<string, { id: string; aspectRatio: number }>();
-	const globalEmoteMap = new Map<string, { id: string; aspectRatio: number }>();
-
-	channelEmotes.forEach((emote) => {
-		channelEmoteMap.set(emote.alias, { id: emote.id, aspectRatio: emote.emote.aspectRatio });
-	});
-
-	globalSevenTVEmotes.forEach((emote) => {
-		globalEmoteMap.set(emote.alias, { id: emote.id, aspectRatio: emote.emote.aspectRatio });
-	});
-
-	let currentPosition = 0;
-	const words = parsed.message.split(' ');
-
-	for (const word of words) {
-		const twitchEmote = parsed.emotes.find((emote) => {
-			const [start] = emote.slicePart.split('-').map(Number);
-
-			return start === currentPosition;
-		});
-
-		if (twitchEmote) {
-			const [start, end] = twitchEmote.slicePart.split('-').map(Number);
-
-			processedWords.push({
-				type: 'emote',
-				id: twitchEmote.emoteId,
-				alias: parsed.message.slice(start, end + 1),
-				aspectRatio: 1,
-				url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
-			});
-		} else {
-			const channelEmote = channelEmoteMap.get(word);
-
-			if (channelEmote) {
-				processedWords.push({
-					type: 'emote',
-					id: channelEmote.id,
-					alias: word,
-					aspectRatio: channelEmote.aspectRatio || 1,
-					url: `https://cdn.7tv.app/emote/${channelEmote.id}/1x.webp`
-				});
-			} else {
-				const globalEmote = globalEmoteMap.get(word);
-
-				if (globalEmote) {
-					processedWords.push({
-						type: 'emote',
-						id: globalEmote.id,
-						alias: word,
-						aspectRatio: globalEmote.aspectRatio || 1,
-						url: `https://cdn.7tv.app/emote/${globalEmote.id}/1x.webp`
-					});
-				} else if (globalTwitchEmotes && globalTwitchEmotes[word]) {
-					const globalTwitchEmote = globalTwitchEmotes[word];
-
-					processedWords.push({
-						type: 'emote',
-						id: globalTwitchEmote.id,
-						alias: word,
-						aspectRatio: 1,
-						url: globalTwitchEmote.url
-					});
-				} else {
-					processedWords.push({
-						type: 'text',
-						content: word + ' '
-					});
-				}
-			}
-		}
-
-		currentPosition += word.length + 1;
-	}
-
-	return {
-		...parsed,
-		processedContent: processedWords
-	};
-}

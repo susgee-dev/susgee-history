@@ -1,6 +1,9 @@
+import { SevenTVEmoteMap } from '@/types/api/7tv';
+import { BadgeMap } from '@/types/api/helix';
+
 export type TwitchBadge = {
-	type: string;
-	version?: string;
+	content: string;
+	url: string;
 };
 
 export enum MessageTypes {
@@ -26,17 +29,28 @@ export type BaseMessage = {
 
 export type ProcessedWord =
 	| { type: 'text'; content: string }
-	| { type: 'emote'; id: string; alias: string; url: string; aspectRatio: number };
+	| { type: 'emote'; content: string; id: string; url: string; aspectRatio: number }
+	| { type: 'link'; content: string; url: string };
 
 export type Emote = {
 	emoteId: string;
-	slicePart: string;
+	start: number;
+	end: number;
+};
+
+export type Cosmetics = {
+	twitch: {
+		emotes?: Emote[];
+		badges: BadgeMap;
+	};
+	sevenTv: {
+		emotes: SevenTVEmoteMap;
+	};
 };
 
 export type ParsedPrivMsg = BaseMessage & {
 	type: MessageTypes.PRIVMSG;
-	message: string;
-	processedContent?: ProcessedWord[];
+	text: ProcessedWord[];
 	reply: null | {
 		login: string;
 		displayName: string;
@@ -47,8 +61,7 @@ export type ParsedPrivMsg = BaseMessage & {
 
 export type ParsedUserNotice = BaseMessage & {
 	type: MessageTypes.USERNOTICE;
-	message: string;
-	processedContent?: ProcessedWord[];
+	text: string[];
 	msgId: string;
 	systemMsg: string;
 	msgParams: Record<string, string>;
@@ -58,5 +71,4 @@ export type ParsedMessage = ParsedPrivMsg | ParsedUserNotice;
 
 export type ChatMessageProps = {
 	message: ParsedMessage;
-	badges: Record<string, string>;
 };

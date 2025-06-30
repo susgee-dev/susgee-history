@@ -52,7 +52,7 @@ class SevenTV extends BaseApi {
 
 		const emotes: SevenTVEmoteMap = new Map();
 
-		for (const item of data?.emoteSets?.emoteSet?.emotes?.items) {
+		for (const item of data?.emoteSets?.emoteSet?.emotes?.items || []) {
 			emotes.set(item.alias, {
 				id: item.id,
 				name: item.alias,
@@ -60,7 +60,7 @@ class SevenTV extends BaseApi {
 			});
 		}
 
-		for (const item of data?.users?.userByConnection?.style?.activeEmoteSet?.emotes?.items) {
+		for (const item of data?.users?.userByConnection?.style?.activeEmoteSet?.emotes?.items || []) {
 			emotes.set(item.alias, {
 				id: item.id,
 				name: item.alias,

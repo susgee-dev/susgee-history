@@ -6,27 +6,6 @@ export type TwitchBadge = {
 	url: string;
 };
 
-export enum MessageTypes {
-	PRIVMSG = 'PRIVMSG',
-	USERNOTICE = 'USERNOTICE'
-}
-
-export type BaseMessage = {
-	id: string;
-	timestamp: number;
-	displayName: string;
-	login: string;
-	bestName: string;
-	color?: string;
-	badges: TwitchBadge[];
-	emotes: Emote[];
-	roles: string[];
-	isVip: boolean;
-	isMod: boolean;
-	isSubscriber: boolean;
-	isFirstMessage: boolean;
-};
-
 export type ProcessedWord =
 	| { type: 'text'; content: string }
 	| { type: 'emote'; content: string; id: string; url: string; aspectRatio: number }
@@ -48,26 +27,37 @@ export type Cosmetics = {
 	};
 };
 
-export type ParsedPrivMsg = BaseMessage & {
-	type: MessageTypes.PRIVMSG;
-	text: ProcessedWord[];
-	reply: null | {
-		login: string;
-		displayName: string;
-		text: string;
-	};
-	isAction: boolean;
-};
+export enum MessageTypes {
+	PRIVMSG = 'PRIVMSG',
+	USERNOTICE = 'USERNOTICE'
+}
 
-export type ParsedUserNotice = BaseMessage & {
-	type: MessageTypes.USERNOTICE;
-	text: string[];
+export type MessageContext = {
+	type: 'reply' | 'system';
+	text: string;
+	username?: string;
+} | null;
+
+export type ParsedMessage = {
+	type: MessageTypes;
+	id: string;
 	msgId: string;
-	systemMsg: string;
-	msgParams: Record<string, string>;
-};
+	timestamp: number;
+	displayName: string;
+	login: string;
+	bestName: string;
+	color?: string;
+	badges: TwitchBadge[];
+	emotes: Emote[];
+	roles: string[];
+	isFirstMessage: boolean;
 
-export type ParsedMessage = ParsedPrivMsg | ParsedUserNotice;
+	text: ProcessedWord[];
+	isAction: boolean;
+
+	context: MessageContext;
+	addColon: boolean;
+};
 
 export type ChatMessageProps = {
 	message: ParsedMessage;

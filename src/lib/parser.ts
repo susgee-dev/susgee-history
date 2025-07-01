@@ -1,13 +1,11 @@
 import logger from '@/lib/logger';
 import { getBestName } from '@/lib/utils';
 import {
-	BaseMessage,
 	Cosmetics,
 	Emote,
+	MessageContext,
 	MessageTypes,
 	ParsedMessage,
-	ParsedPrivMsg,
-	ParsedUserNotice,
 	ProcessedWord,
 	TwitchBadge
 } from '@/types/message';
@@ -41,11 +39,12 @@ class Parser {
 		rawMessage: string,
 		msgSplitIndex: number,
 		cosmetics: any
-	): ParsedPrivMsg | null {
+	): ParsedMessage | null {
 		try {
 			const prefixAndTags = rawMessage.substring(0, msgSplitIndex);
 			const tagsPart = prefixAndTags.startsWith('@') ? prefixAndTags.split(' ')[0] : '';
-			const loginMatch = rawMessage.match(/:[^!]+!([^@]+)@/);
+
+			const loginMatch = prefixAndTags.match(/!([a-z0-9_]{1,25})@/);
 
 			if (!loginMatch) return null;
 			const login = loginMatch[1];
@@ -65,17 +64,16 @@ class Parser {
 			const tags = this.parseTags(tagsPart);
 			const displayName = tags.get('display-name') || login;
 
-			let reply = null;
+			let context: MessageContext = null;
 
 			if (tags.get('reply-parent-msg-id')) {
-				const replyDisplayName = tags.get('reply-parent-display-name') || '';
-				const replyLogin = tags.get('reply-parent-user-login') || '';
+				const username = tags.get('reply-parent-user-login') || '';
 				const text = tags.get('reply-parent-msg-body')?.replaceAll('\\s', ' ') || '';
 
-				reply = {
+				context = {
+					type: 'reply',
 					text,
-					login: replyLogin,
-					displayName: replyDisplayName
+					username
 				};
 			}
 
@@ -86,7 +84,7 @@ class Parser {
 			const processedMessage = this.processText(messageContent, cosmetics);
 
 			// remove @user if it's a reply
-			if (reply && processedMessage[0]?.content?.startsWith('@')) {
+			if (context && processedMessage[0]?.content?.startsWith('@')) {
 				processedMessage.shift();
 			}
 
@@ -95,7 +93,8 @@ class Parser {
 				type: MessageTypes.PRIVMSG,
 				text: processedMessage,
 				isAction,
-				reply
+				addColon: !isAction,
+				context
 			};
 		} catch (error) {
 			logger.error('Error processing PRIVMSG:', error);
@@ -164,7 +163,7 @@ class Parser {
 		return processedWords;
 	}
 
-	private processUserNotice(rawMessage: string, msgSplitIndex: number): ParsedUserNotice | null {
+	private processUserNotice(rawMessage: string, msgSplitIndex: number): ParsedMessage | null {
 		try {
 			const prefixAndTags = rawMessage.substring(0, msgSplitIndex);
 			const tagsPart = prefixAndTags.startsWith('@') ? prefixAndTags.split(' ')[0] : '';
@@ -179,28 +178,48 @@ class Parser {
 			const tags = this.parseTags(tagsPart);
 			const displayName = tags.get('display-name') || login;
 
-			const msgId = tags.get('msg-id') || '';
+			const baseMessage = this.createBaseMessage(tags, login, displayName);
+			const words: ProcessedWord[] = messageContent
+				.split(' ')
+				.filter(Boolean)
+				.map((word) => ({
+					type: 'text',
+					content: word
+				}));
+
+			let context: MessageContext = null;
 			const systemMsg = tags.get('system-msg')?.replaceAll('\\s', ' ') || '';
 
-			const msgParams: Record<string, string> = {};
+			if (systemMsg) {
+				context = {
+					type: 'system',
+					text: systemMsg
+				};
 
-			tags.forEach((value, key) => {
-				if (key.startsWith('msg-param-')) {
-					const paramName = key.replace('msg-param-', '');
+				if (!words.length) {
+					const systemMsgWords = systemMsg.split(' ');
 
-					msgParams[paramName] = value;
+					systemMsgWords.shift();
+
+					return {
+						...baseMessage,
+						type: MessageTypes.USERNOTICE,
+						text: systemMsgWords.map((word) => ({
+							type: 'text',
+							content: word
+						})),
+						addColon: false,
+						msgId: tags.get('msg-id') || ''
+					};
 				}
-			});
-
-			const baseMessage = this.createBaseMessage(tags, login, displayName);
+			}
 
 			return {
 				...baseMessage,
 				type: MessageTypes.USERNOTICE,
-				text: messageContent.split(' ').filter(Boolean),
-				msgId,
-				systemMsg,
-				msgParams
+				text: words,
+				msgId: tags.get('msg-id') || '',
+				context
 			};
 		} catch (error) {
 			logger.error('Error processing USERNOTICE:', error);
@@ -214,9 +233,12 @@ class Parser {
 		login: string,
 		displayName: string,
 		cosmetics?: Cosmetics
-	): BaseMessage {
+	): ParsedMessage {
 		return {
+			type: MessageTypes.PRIVMSG,
 			id: tags.get('id') || '',
+			msgId: '',
+			text: [],
 			timestamp: parseInt(tags.get('tmi-sent-ts') || '0', 10),
 			displayName,
 			login,
@@ -225,10 +247,11 @@ class Parser {
 			badges: this.parseBadges(tags.get('badges') || '', cosmetics),
 			emotes: this.parseEmotes(tags.get('emotes') || ''),
 			roles: this.parseRoles(tags),
-			isVip: tags.get('vip') === '1',
-			isMod: tags.get('mod') === '1',
-			isSubscriber: tags.get('subscriber') === '1',
-			isFirstMessage: tags.get('first-msg') === '1'
+
+			isAction: false,
+			isFirstMessage: tags.get('first-msg') === '1',
+			context: null,
+			addColon: true
 		};
 	}
 

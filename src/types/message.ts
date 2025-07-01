@@ -28,6 +28,7 @@ export type Cosmetics = {
 };
 
 export enum MessageTypes {
+	CLEARCHAT = 'CLEARCHAT',
 	PRIVMSG = 'PRIVMSG',
 	USERNOTICE = 'USERNOTICE'
 }
@@ -38,10 +39,8 @@ export type MessageContext = {
 	username?: string;
 } | null;
 
-export type ParsedMessage = {
-	type: MessageTypes;
+export interface BaseMessage {
 	id: string;
-	msgId: string;
 	timestamp: number;
 	displayName: string;
 	login: string;
@@ -50,13 +49,30 @@ export type ParsedMessage = {
 	badges: TwitchBadge[];
 	emotes: Emote[];
 	isFirstMessage: boolean;
-
 	text: ProcessedWord[];
-	isAction: boolean;
+}
 
+export interface PrivateMessage extends BaseMessage {
+	type: MessageTypes.PRIVMSG;
+	isAction: boolean;
 	context: MessageContext;
 	addColon: boolean;
-};
+}
+
+export interface UserNoticeMessage extends BaseMessage {
+	type: MessageTypes.USERNOTICE;
+	msgId: string;
+	context: MessageContext;
+	addColon?: boolean;
+}
+
+export interface ClearChatMessage extends BaseMessage {
+	type: MessageTypes.CLEARCHAT;
+	targetUser: string;
+	banDuration?: number;
+}
+
+export type ParsedMessage = PrivateMessage | UserNoticeMessage | ClearChatMessage;
 
 export type ParsedIRC = {
 	cmd: string;
@@ -64,8 +80,4 @@ export type ParsedIRC = {
 	prefix: string;
 	rest: string;
 	cosmetics: Cosmetics;
-};
-
-export type ChatMessageProps = {
-	message: ParsedMessage;
 };

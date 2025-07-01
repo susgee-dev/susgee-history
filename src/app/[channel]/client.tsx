@@ -4,11 +4,19 @@ import { useEffect, useState } from 'react';
 
 import { fetchChannelData } from './actions';
 
-import ChatMessage from '@/components/chat-message';
+import ClearChat from '@/components/clear-chat';
+import PrivMessage from '@/components/priv-message';
 import Error from '@/components/ui/error';
 import { Heading } from '@/components/ui/heading';
 import { Link } from '@/components/ui/link';
-import { ParsedMessage } from '@/types/message';
+import UserNotice from '@/components/user-notice';
+import {
+	ClearChatMessage,
+	MessageTypes,
+	ParsedMessage,
+	PrivateMessage,
+	UserNoticeMessage
+} from '@/types/message';
 
 export default function ChannelPageClient({ channel }: { channel: string }) {
 	const [parsed, setParsed] = useState<ParsedMessage[]>([]);
@@ -61,9 +69,18 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 				</div>
 			) : (
 				<div className="flex flex-col gap-1">
-					{parsed.map((msg) => (
-						<ChatMessage key={msg.id} message={msg} />
-					))}
+					{parsed.map((msg) => {
+						switch (msg.type) {
+							case MessageTypes.USERNOTICE:
+								return <UserNotice key={msg.id} message={msg as UserNoticeMessage} />;
+							case MessageTypes.PRIVMSG:
+								return <PrivMessage key={msg.id} message={msg as PrivateMessage} />;
+							case MessageTypes.CLEARCHAT:
+								return <ClearChat key={msg.id} message={msg as ClearChatMessage} />;
+							default:
+								return null;
+						}
+					})}
 				</div>
 			)}
 		</>

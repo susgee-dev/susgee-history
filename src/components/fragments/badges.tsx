@@ -1,12 +1,8 @@
 import Image from 'next/image';
 
-import { MessageTypes, ParsedMessage } from '@/types/message';
+import { BaseMessage } from '@/types/message';
 
-export default function Badges({ message }: { message: ParsedMessage }) {
-	if (message.type === MessageTypes.USERNOTICE) {
-		return null;
-	}
-
+export default function Badges({ message }: { message: BaseMessage }) {
 	return message.badges.map((badge, index) => {
 		return (
 			<Image

@@ -33,13 +33,7 @@ export default function MessageText({ message, isAction = false }: MessageTextPr
 
 					case 'link': {
 						return (
-							<Link
-								key={index}
-								className="text-primary"
-								href={word.url}
-								target="_blank"
-								title={word.content}
-							>
+							<Link key={index} href={word.url} target="_blank" title={word.content}>
 								{word.content}
 							</Link>
 						);

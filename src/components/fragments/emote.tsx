@@ -30,20 +30,18 @@ export default function EmoteImage({ src, alt, title, aspectRatio }: Emote) {
 	}
 
 	return (
-		<>
-			<Image
-				unoptimized
-				alt={alt}
-				className="mx-0.5 inline-block align-sub"
-				height={height}
-				loading="lazy"
-				src={src}
-				title={title}
-				width={width}
-				onError={() => {
-					setHasError(true);
-				}}
-			/>
-		</>
+		<Image
+			unoptimized
+			alt={alt}
+			className="mx-0.5 inline-block align-sub"
+			height={height}
+			loading="lazy"
+			src={src}
+			title={title}
+			width={width}
+			onError={() => {
+				setHasError(true);
+			}}
+		/>
 	);
 }

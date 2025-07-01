@@ -49,7 +49,6 @@ export type ParsedMessage = {
 	color?: string;
 	badges: TwitchBadge[];
 	emotes: Emote[];
-	roles: string[];
 	isFirstMessage: boolean;
 
 	text: ProcessedWord[];
@@ -57,6 +56,14 @@ export type ParsedMessage = {
 
 	context: MessageContext;
 	addColon: boolean;
+};
+
+export type ParsedIRC = {
+	cmd: string;
+	tags: Map<string, string>;
+	prefix: string;
+	rest: string;
+	cosmetics: Cosmetics;
 };
 
 export type ChatMessageProps = {

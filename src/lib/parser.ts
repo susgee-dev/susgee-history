@@ -5,234 +5,160 @@ import {
 	Emote,
 	MessageContext,
 	MessageTypes,
+	ParsedIRC,
 	ParsedMessage,
 	ProcessedWord,
 	TwitchBadge
 } from '@/types/message';
 
+const fallbackColor = '#808080';
+
 class Parser {
-	private fallbackColor = '#808080';
+	private readonly handlers: Record<string, (parsed: ParsedIRC) => ParsedMessage | null> = {
+		PRIVMSG: this.handlePrivMsg.bind(this),
+		USERNOTICE: this.handleUserNotice.bind(this)
+	};
 
 	process(rawMessage: string, cosmetics: Cosmetics): ParsedMessage | null {
-		try {
-			const privMsgSplitIndex = rawMessage.indexOf(' PRIVMSG ');
+		const parsed = this.parseRaw(rawMessage);
 
-			if (privMsgSplitIndex !== -1) {
-				return this.processPrivMsg(rawMessage, privMsgSplitIndex, cosmetics);
-			}
+		if (!parsed) return null;
 
-			const userNoticeSplitIndex = rawMessage.indexOf(' USERNOTICE ');
+		const handler = this.handlers[parsed.cmd];
 
-			if (userNoticeSplitIndex !== -1) {
-				return this.processUserNotice(rawMessage, userNoticeSplitIndex);
-			}
-
-			logger.warn(`unhandled message type: ${rawMessage}`);
+		if (!handler) {
+			logger.warn(`unhandled message type: ${JSON.stringify(rawMessage)}`);
 
 			return null;
+		}
+
+		try {
+			return handler({ ...parsed, cosmetics });
+		} catch (error) {
+			logger.error(`Error processing ${parsed.cmd}:`, error);
+
+			return null;
+		}
+	}
+
+	private parseRaw(raw: string): Omit<ParsedIRC, 'cosmetics'> | null {
+		const match = raw.match(/^(?:@([^ ]+) )?(?::([^ ]+) )?([A-Z]+) (.+)$/);
+
+		if (!match) return null;
+
+		const [, tagsStr = '', prefix = '', cmd, rest] = match;
+
+		const tags = new Map(
+			tagsStr.split(';').map((tag) => {
+				const [key, value = ''] = tag.split('=');
+
+				return [key, this.safeDecode(value) || ''];
+			})
+		);
+
+		return { cmd, tags, prefix, rest };
+	}
+
+	private safeDecode(v: string): string {
+		try {
+			return decodeURIComponent(v);
 		} catch {
-			return null;
+			return v;
 		}
 	}
 
-	private processPrivMsg(
-		rawMessage: string,
-		msgSplitIndex: number,
-		cosmetics: any
-	): ParsedMessage | null {
-		try {
-			const prefixAndTags = rawMessage.substring(0, msgSplitIndex);
-			const tagsPart = prefixAndTags.startsWith('@') ? prefixAndTags.split(' ')[0] : '';
+	private handlePrivMsg({ tags, prefix, rest, cosmetics }: ParsedIRC): ParsedMessage | null {
+		const loginMatch = prefix.match(/!([a-z0-9_]{1,25})@/);
 
-			const loginMatch = prefixAndTags.match(/!([a-z0-9_]{1,25})@/);
+		if (!loginMatch) return null;
+		const login = loginMatch[1];
 
-			if (!loginMatch) return null;
-			const login = loginMatch[1];
+		const messageMatch = rest.match(/#[^ ]+ ?:?(.*)$/);
 
-			const messageMatch = rawMessage.match(/PRIVMSG #[^ ]+ ?:?(.*)$/);
+		if (!messageMatch) return null;
+		let messageContent = messageMatch[1].trim();
 
-			if (!messageMatch) return null;
-			let messageContent = messageMatch[1].trim();
+		const isAction =
+			messageContent.startsWith('\u0001ACTION ') && messageContent.endsWith('\u0001');
 
-			const isAction =
-				messageContent.startsWith('\u0001ACTION ') && messageContent.endsWith('\u0001');
+		if (isAction) messageContent = messageContent.slice(8, -1).trim();
 
-			if (isAction) {
-				messageContent = messageContent.slice(8, -1).trim();
-			}
+		const displayName = tags.get('display-name') || login;
 
-			const tags = this.parseTags(tagsPart);
-			const displayName = tags.get('display-name') || login;
+		let context: MessageContext = null;
 
-			let context: MessageContext = null;
+		if (tags.get('reply-parent-msg-id')) {
+			const username = tags.get('reply-parent-user-login') || '';
+			const text = tags.get('reply-parent-msg-body')?.replaceAll('\\s', ' ') || '';
 
-			if (tags.get('reply-parent-msg-id')) {
-				const username = tags.get('reply-parent-user-login') || '';
-				const text = tags.get('reply-parent-msg-body')?.replaceAll('\\s', ' ') || '';
-
-				context = {
-					type: 'reply',
-					text,
-					username
-				};
-			}
-
-			const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics);
-
-			cosmetics.twitch.emotes = baseMessage.emotes;
-
-			const processedMessage = this.processText(messageContent, cosmetics);
-
-			// remove @user if it's a reply
-			if (context && processedMessage[0]?.content?.startsWith('@')) {
-				processedMessage.shift();
-			}
-
-			return {
-				...baseMessage,
-				type: MessageTypes.PRIVMSG,
-				text: processedMessage,
-				isAction,
-				addColon: !isAction,
-				context
-			};
-		} catch (error) {
-			logger.error('Error processing PRIVMSG:', error);
-
-			return null;
-		}
-	}
-
-	private processText(message: string, cosmetics: Cosmetics): ProcessedWord[] {
-		if (!message) return [];
-
-		const processedWords: ProcessedWord[] = [];
-
-		const twitchEmotes = cosmetics.twitch.emotes || [];
-		const stvEmotes = cosmetics.sevenTv.emotes;
-
-		const words = message.split(' ');
-		let currentMessageIndex = 0;
-
-		for (const word of words) {
-			const twitchEmote = twitchEmotes.find((emote) => emote.start === currentMessageIndex);
-
-			if (twitchEmote) {
-				processedWords.push({
-					type: 'emote',
-					id: twitchEmote.emoteId,
-					content: word,
-					aspectRatio: 1,
-					url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
-				});
-
-				currentMessageIndex += word.length + 1;
-				continue;
-			}
-
-			const stvEmote = stvEmotes.get(word);
-
-			if (stvEmote) {
-				processedWords.push({
-					type: 'emote',
-					id: stvEmote.id,
-					content: stvEmote.name,
-					aspectRatio: stvEmote.aspectRatio,
-					url: `https://cdn.7tv.app/emote/${stvEmote.id}/1x.webp`
-				});
-
-				currentMessageIndex += word.length + 1;
-				continue;
-			}
-
-			if (/^https?:\/\//.test(word)) {
-				processedWords.push({
-					type: 'link',
-					content: word,
-					url: word
-				});
-
-				currentMessageIndex += word.length + 1;
-				continue;
-			}
-
-			currentMessageIndex += word.length + 1;
-			processedWords.push({ type: 'text', content: word });
+			context = { type: 'reply', text, username };
 		}
 
-		return processedWords;
+		const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics);
+
+		cosmetics.twitch.emotes = baseMessage.emotes;
+
+		const processedMessage = this.processText(messageContent, cosmetics);
+
+		if (context && processedMessage[0]?.content?.startsWith('@')) processedMessage.shift();
+
+		return {
+			...baseMessage,
+			type: MessageTypes.PRIVMSG,
+			text: processedMessage,
+			isAction,
+			addColon: !isAction,
+			context
+		};
 	}
 
-	private processUserNotice(rawMessage: string, msgSplitIndex: number): ParsedMessage | null {
-		try {
-			const prefixAndTags = rawMessage.substring(0, msgSplitIndex);
-			const tagsPart = prefixAndTags.startsWith('@') ? prefixAndTags.split(' ')[0] : '';
-			const loginMatch = rawMessage.match(/:[^!]+!([^@]+)@/) || rawMessage.match(/login=([^;]+)/);
+	private handleUserNotice({ tags, rest, cosmetics, prefix }: ParsedIRC): ParsedMessage | null {
+		const login = tags.get('login') || prefix.match(/!([^@]+)@/)?.[1] || null;
 
-			if (!loginMatch) return null;
-			const login = loginMatch[1];
+		if (!login) return null;
 
-			const messageMatch = rawMessage.match(/USERNOTICE #[^ ]+ ?:?(.*)$/);
-			const messageContent = messageMatch ? messageMatch[1].trim() : '';
+		const displayName = tags.get('display-name') || login;
+		const messageContent = rest.match(/#[^ ]+ ?:?(.*)$/)?.[1].trim() || '';
 
-			const tags = this.parseTags(tagsPart);
-			const displayName = tags.get('display-name') || login;
+		const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics);
+		const text = messageContent ? this.processText(messageContent, cosmetics) : [];
 
-			const baseMessage = this.createBaseMessage(tags, login, displayName);
-			const words: ProcessedWord[] = messageContent
+		const systemMsg = tags.get('system-msg')?.replaceAll('\\s', ' ') || '';
+		const msgId = tags.get('msg-id') || '';
+
+		let context: MessageContext | null = null;
+
+		if (systemMsg) {
+			context = { type: 'system', text: systemMsg };
+		}
+
+		const result: ParsedMessage = {
+			...baseMessage,
+			type: MessageTypes.USERNOTICE,
+			text,
+			msgId,
+			context
+		};
+
+		const isSystemOnly = systemMsg && !text.length;
+
+		if (isSystemOnly) {
+			result.text = systemMsg
 				.split(' ')
-				.filter(Boolean)
-				.map((word) => ({
-					type: 'text',
-					content: word
-				}));
-
-			let context: MessageContext = null;
-			const systemMsg = tags.get('system-msg')?.replaceAll('\\s', ' ') || '';
-
-			if (systemMsg) {
-				context = {
-					type: 'system',
-					text: systemMsg
-				};
-
-				if (!words.length) {
-					const systemMsgWords = systemMsg.split(' ');
-
-					systemMsgWords.shift();
-
-					return {
-						...baseMessage,
-						type: MessageTypes.USERNOTICE,
-						text: systemMsgWords.map((word) => ({
-							type: 'text',
-							content: word
-						})),
-						addColon: false,
-						msgId: tags.get('msg-id') || ''
-					};
-				}
-			}
-
-			return {
-				...baseMessage,
-				type: MessageTypes.USERNOTICE,
-				text: words,
-				msgId: tags.get('msg-id') || '',
-				context
-			};
-		} catch (error) {
-			logger.error('Error processing USERNOTICE:', error);
-
-			return null;
+				.slice(1)
+				.map((word) => ({ type: 'text', content: word }));
+			result.addColon = false;
+			result.context = null;
 		}
+
+		return result;
 	}
 
 	private createBaseMessage(
 		tags: Map<string, string>,
 		login: string,
 		displayName: string,
-		cosmetics?: Cosmetics
+		cosmetics: Cosmetics
 	): ParsedMessage {
 		return {
 			type: MessageTypes.PRIVMSG,
@@ -243,11 +169,9 @@ class Parser {
 			displayName,
 			login,
 			bestName: getBestName(displayName, login),
-			color: tags.get('color') || this.fallbackColor,
+			color: tags.get('color') || fallbackColor,
 			badges: this.parseBadges(tags.get('badges') || '', cosmetics),
 			emotes: this.parseEmotes(tags.get('emotes') || ''),
-			roles: this.parseRoles(tags),
-
 			isAction: false,
 			isFirstMessage: tags.get('first-msg') === '1',
 			context: null,
@@ -255,24 +179,60 @@ class Parser {
 		};
 	}
 
-	private parseTags(tagsPart: string): Map<string, string> {
-		const tagsMap = new Map<string, string>();
+	private processText(message: string, cosmetics: Cosmetics): ProcessedWord[] {
+		if (!message) return [];
 
-		if (!tagsPart.startsWith('@')) return tagsMap;
+		const processed: ProcessedWord[] = [];
+		const twitchEmotes = cosmetics.twitch.emotes || [];
+		const stvEmotes = cosmetics.sevenTv.emotes;
 
-		const tags = tagsPart.slice(1).split(';');
+		const words = message.split(' ');
+		let index = 0;
 
-		for (const tag of tags) {
-			const [key, value = ''] = tag.split('=');
+		for (const word of words) {
+			const twitchEmote = twitchEmotes.find((e) => e.start === index);
 
-			tagsMap.set(key, decodeURIComponent(value));
+			if (twitchEmote) {
+				processed.push({
+					type: 'emote',
+					id: twitchEmote.emoteId,
+					content: word,
+					aspectRatio: 1,
+					url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
+				});
+				index += word.length + 1;
+				continue;
+			}
+
+			const stvEmote = stvEmotes.get(word);
+
+			if (stvEmote) {
+				processed.push({
+					type: 'emote',
+					id: stvEmote.id,
+					content: stvEmote.name,
+					aspectRatio: stvEmote.aspectRatio,
+					url: `https://cdn.7tv.app/emote/${stvEmote.id}/1x.webp`
+				});
+				index += word.length + 1;
+				continue;
+			}
+
+			if (/^https?:\/\//.test(word)) {
+				processed.push({ type: 'link', content: word, url: word });
+				index += word.length + 1;
+				continue;
+			}
+
+			processed.push({ type: 'text', content: word });
+			index += word.length + 1;
 		}
 
-		return tagsMap;
+		return processed;
 	}
 
-	private parseBadges(badgesStr: string, cosmetics?: Cosmetics): TwitchBadge[] {
-		if (!badgesStr || !cosmetics) return [];
+	private parseBadges(badgesStr: string, cosmetics: Cosmetics): TwitchBadge[] {
+		if (!badgesStr) return [];
 
 		return badgesStr
 			.split(',')

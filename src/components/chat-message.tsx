@@ -27,7 +27,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 				</div>
 			)}
 
-			<span className="mr-1 font-mono text-sm text-muted-foreground">
+			<span className="font-mono text-sm text-muted-foreground">
 				{formatTime(message.timestamp)}{' '}
 			</span>
 

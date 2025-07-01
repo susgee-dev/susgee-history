@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { fetchChannelData } from './actions';
 
 import ClearChat from '@/components/clear-chat';
+import NewDay from '@/components/fragments/new-day';
 import PrivMessage from '@/components/priv-message';
 import Error from '@/components/ui/error';
 import { Heading } from '@/components/ui/heading';
@@ -47,7 +48,7 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 		<>
 			<Link href="/">← back to search</Link>
 
-			<div className="mb-4 flex flex-wrap items-end justify-between border-b border-primary/30 pb-4">
+			<div className="mb-4 flex flex-wrap items-end justify-between">
 				<Heading as="h3" variant="compact">
 					recent messages for:
 				</Heading>
@@ -57,7 +58,7 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 			</div>
 
 			{isLoading ? (
-				<div className="flex items-center justify-center py-16">
+				<div key="loading-state" className="flex items-center justify-center py-16">
 					<div className="relative">
 						<div className="h-8 w-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
 						<div
@@ -69,17 +70,32 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 				</div>
 			) : (
 				<div className="flex flex-col gap-1">
-					{parsed.map((msg) => {
-						switch (msg.type) {
-							case MessageTypes.USERNOTICE:
-								return <UserNotice key={msg.id} message={msg as UserNoticeMessage} />;
-							case MessageTypes.PRIVMSG:
-								return <PrivMessage key={msg.id} message={msg as PrivateMessage} />;
-							case MessageTypes.CLEARCHAT:
-								return <ClearChat key={msg.id} message={msg as ClearChatMessage} />;
-							default:
-								return null;
-						}
+					{parsed.map((msg, index) => {
+						const currentDate = new Date(msg.timestamp).toDateString();
+						const prevDate =
+							index > 0 ? new Date(parsed[index - 1].timestamp).toDateString() : null;
+
+						const dayChanged = index === 0 || currentDate !== prevDate;
+
+						return (
+							<div key={`parent-${msg.id}`}>
+								{dayChanged && (
+									<NewDay key={`new-day-${msg.timestamp}`} timestamp={msg.timestamp} />
+								)}
+								{(() => {
+									switch (msg.type) {
+										case MessageTypes.USERNOTICE:
+											return <UserNotice key={msg.id} message={msg as UserNoticeMessage} />;
+										case MessageTypes.PRIVMSG:
+											return <PrivMessage key={msg.id} message={msg as PrivateMessage} />;
+										case MessageTypes.CLEARCHAT:
+											return <ClearChat key={msg.id} message={msg as ClearChatMessage} />;
+										default:
+											return null;
+									}
+								})()}
+							</div>
+						);
 					})}
 				</div>
 			)}

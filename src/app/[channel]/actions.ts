@@ -18,7 +18,7 @@ export async function fetchChannelData(channel: string) {
 	}
 
 	const [messages, globalBadges, channelBadges, stvEmotes] = await Promise.all([
-		recentMessages.get(channel),
+		recentMessages.get(channel.toLowerCase()),
 		helix.getGlobalBadges(),
 		helix.getChannelBadges(channelId),
 		sevenTV.getEmotes(channelId)

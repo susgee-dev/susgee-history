@@ -58,7 +58,6 @@ function Button({
 	if (href) {
 		return (
 			<Link
-				unstyled
 				className={buttonClass}
 				href={href}
 				{...(props as Omit<React.ComponentPropsWithoutRef<typeof Link>, 'className' | 'href'>)}

@@ -86,27 +86,51 @@ class Parser {
 			login,
 			bestName: getBestName(displayName, login),
 			color: tags.get('color') || this.fallbackColor,
-			badges: this.parseBadges(tags.get('badges') || '', cosmetics),
+			badges: this.parseBadges(tags.get('badges') || '', tags.get('badge-info') || '', cosmetics),
 			emotes: this.parseEmotes(tags.get('emotes') || ''),
 			isFirstMessage: tags.get('first-msg') === '1'
 		};
 	}
 
-	private parseBadges(badgesStr: string, cosmetics: Cosmetics): TwitchBadge[] {
+	private parseBadges(
+		badgesStr: string,
+		badgesInfoStr: string,
+		cosmetics: Cosmetics
+	): TwitchBadge[] {
 		if (!badgesStr) return [];
+
+		const badgesInfo = new Map<string, string>(
+			badgesInfoStr.split(',').map((badgeInfoStr) => {
+				const [badgeType, version] = badgeInfoStr.split('/');
+
+				return [badgeType, version];
+			})
+		);
 
 		return badgesStr
 			.split(',')
 			.map((badgeStr) => {
 				const [type, version] = badgeStr.split('/');
 				const badgeKey = `${type}_${version}`;
-				const url = cosmetics.twitch.badges.get(badgeKey);
+				const badgeInfo = cosmetics.twitch.badges.get(badgeKey);
 
-				if (!url) return;
+				if (!badgeInfo) return;
+
+				let title = badgeInfo.title;
+
+				const monthsBadgeTypes = ['subscriber', 'founder'];
+
+				if (monthsBadgeTypes.includes(type) && badgesInfo.has(type)) {
+					const months = badgesInfo.get(type);
+
+					if (months && parseInt(months) > 1) {
+						title += ` (${months} months)`;
+					}
+				}
 
 				return {
-					content: type,
-					url
+					content: title,
+					url: badgeInfo.url
 				};
 			})
 			.filter((badge): badge is TwitchBadge => badge !== null);

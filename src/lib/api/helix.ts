@@ -41,7 +41,10 @@ class Helix extends BaseApi {
 		for (const set of response?.data || []) {
 			for (const version of Object.values(set.versions) as TwitchBadgeVersion[]) {
 				if (version?.id && version.image_url_2x) {
-					result.set(`${set.set_id}_${version.id}`, version.image_url_2x);
+					result.set(`${set.set_id}_${version.id}`, {
+						url: version.image_url_2x,
+						title: version.title
+					});
 				}
 			}
 		}
@@ -59,7 +62,10 @@ class Helix extends BaseApi {
 		for (const set of response?.data || []) {
 			for (const version of Object.values(set.versions) as TwitchBadgeVersion[]) {
 				if (version?.id && version.image_url_2x) {
-					result.set(`${set.set_id}_${version.id}`, version.image_url_2x);
+					result.set(`${set.set_id}_${version.id}`, {
+						url: version.image_url_2x,
+						title: version.title
+					});
 				}
 			}
 		}

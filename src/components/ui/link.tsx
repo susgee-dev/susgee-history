@@ -7,14 +7,16 @@ import { cn } from '@/lib/utils';
 type LinkProps = ComponentPropsWithoutRef<'a'> & {
 	href: string;
 	className?: string;
+	unstyled?: boolean;
 };
 
-export function Link({ href, className, ...props }: LinkProps) {
+export function Link({ href, className, unstyled = false, ...props }: LinkProps) {
 	return (
 		<NextLink
 			className={cn(
 				className,
-				'text-medium tap-highlight-transparent hover:opacity-hover active:opacity-disabled relative inline-flex items-center pl-1 text-primary no-underline outline-none transition-colors hover:text-primary-60'
+				!unstyled && 'text-primary no-underline transition-colors hover:text-primary-60',
+				'text-medium tap-highlight-transparent hover:opacity-hover active:opacity-disabled relative items-center outline-none'
 			)}
 			href={href}
 			{...props}

@@ -1,8 +1,11 @@
 'use client';
 
+import { MouseEvent, useEffect, useState } from 'react';
+
 import Badges from '@/components/fragments/badges';
 import MessageText from '@/components/fragments/message-text';
 import Timestamp from '@/components/fragments/timestamp';
+import { Link } from '@/components/ui/link';
 import { cn } from '@/lib/utils';
 import { PrivateMessage } from '@/types/message';
 
@@ -11,21 +14,66 @@ type ChatMessageProps = {
 };
 
 export default function PrivMessage({ message }: ChatMessageProps) {
+	const [isHighlighted, setIsHighlighted] = useState(false);
+
+	useEffect(() => {
+		const checkHash = () => {
+			if (window.location.hash === `#${message.id}`) {
+				setIsHighlighted(true);
+
+				const timer = setTimeout(() => {
+					setIsHighlighted(false);
+				}, 2000);
+
+				return () => clearTimeout(timer);
+			}
+		};
+
+		checkHash();
+
+		window.addEventListener('hashchange', checkHash);
+
+		return () => {
+			window.removeEventListener('hashchange', checkHash);
+		};
+	}, [message.id]);
+
+	const handleReplyClick = (e: MouseEvent<HTMLAnchorElement>) => {
+		e.preventDefault();
+
+		const targetId = message.context?.id;
+
+		if (!targetId) return;
+
+		const targetElement = document.getElementById(targetId);
+
+		if (targetElement) {
+			window.location.hash = '';
+
+			setTimeout(() => {
+				window.location.hash = targetId;
+				targetElement.scrollIntoView({ behavior: 'smooth' });
+			}, 5);
+		}
+	};
+
 	return (
 		<div
 			className={cn(
 				'w-full break-words px-1 text-lg/6',
-				message.isFirstMessage ? 'bg-green-500/20' : ''
+				message.isFirstMessage ? 'bg-green-500/20' : '',
+				isHighlighted ? 'animate-highlight' : ''
 			)}
+			id={message.id}
 		>
 			{message.context && (
 				<div className="relative top-0.5 text-sm text-muted-foreground">
 					{message.context.type === 'system' && message.context.text}
 					{message.context.type === 'reply' && (
-						<>
+						<Link href={`#${message.context.id}`} unstyled={true} onClick={handleReplyClick}>
 							Replying to <span className="font-medium">@{message.context.username}</span>:{' '}
 							{message.context.text}
-						</>
+						</Link>
 					)}
 				</div>
 			)}

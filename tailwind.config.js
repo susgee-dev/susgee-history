@@ -6,6 +6,16 @@ const config = {
 	],
 	theme: {
 		extend: {
+			keyframes: {
+				highlight: {
+					'0%': { backgroundColor: 'rgba(184, 127, 237, 0.6)' },
+					'50%': { backgroundColor: 'rgba(184, 127, 237, 0.3)' },
+					'100%': { backgroundColor: 'transparent' }
+				}
+			},
+			animation: {
+				highlight: 'highlight 2s ease-in-out'
+			},
 			backgroundImage: {
 				'gradient-text':
 					'linear-gradient(145deg, rgba(184, 127, 237, 100%) 0%, rgba(96, 30, 158, 100%) 100%)',

@@ -37,6 +37,7 @@ export type MessageContext = {
 	type: 'reply' | 'system';
 	text: string;
 	username?: string;
+	id?: string;
 } | null;
 
 export interface BaseMessage {

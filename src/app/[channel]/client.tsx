@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
 import { fetchChannelData } from './actions';
 
@@ -78,7 +78,7 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 						const dayChanged = index === 0 || currentDate !== prevDate;
 
 						return (
-							<div key={`parent-${msg.id}`}>
+							<Fragment key={`parent-${msg.id}`}>
 								{dayChanged && (
 									<NewDay key={`new-day-${msg.timestamp}`} timestamp={msg.timestamp} />
 								)}
@@ -94,7 +94,7 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 											return null;
 									}
 								})()}
-							</div>
+							</Fragment>
 						);
 					})}
 				</div>

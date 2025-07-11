@@ -226,11 +226,18 @@ class Parser {
 
 		let context: MessageContext = null;
 
-		if (tags.get('reply-parent-msg-id')) {
+		const parentMsgId = tags.get('reply-parent-msg-id');
+
+		if (parentMsgId) {
 			const username = tags.get('reply-parent-user-login') || '';
 			const text = tags.get('reply-parent-msg-body')?.replaceAll('\\s', ' ') || '';
 
-			context = { type: 'reply', text, username };
+			context = {
+				id: parentMsgId,
+				type: 'reply',
+				text,
+				username
+			};
 		}
 
 		const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics);

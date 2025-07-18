@@ -6,9 +6,29 @@ import recentMessages from '@/lib/api/recentMessages';
 import parser from '@/lib/parser';
 import { Cosmetics, ParsedMessage } from '@/types/message';
 
-export async function fetchChannelData(channel: string) {
+export async function fetchChannelData(
+	channel: string, 
+	options?: { provider?: string; limit?: number }
+) {
 	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
 		throw new Error('Invalid channel name');
+	}
+
+	// Validate options
+	if (options?.limit && (options.limit < 1 || options.limit > 50000)) {
+		throw new Error('Limit must be between 1 and 50,000');
+	}
+
+	if (options?.provider) {
+		try {
+			const url = new URL(options.provider);
+			// Ensure the URL ends with a slash
+			if (!options.provider.endsWith('/')) {
+				options.provider = options.provider + '/';
+			}
+		} catch {
+			throw new Error('Invalid provider URL');
+		}
 	}
 
 	const channelId = await helix.getUserId(channel);
@@ -18,7 +38,7 @@ export async function fetchChannelData(channel: string) {
 	}
 
 	const [messages, globalBadges, channelBadges, stvEmotes] = await Promise.all([
-		recentMessages.get(channel.toLowerCase()),
+		recentMessages.get(channel.toLowerCase(), options),
 		helix.getGlobalBadges(),
 		helix.getChannelBadges(channelId),
 		sevenTV.getEmotes(channelId)

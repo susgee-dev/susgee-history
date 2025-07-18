@@ -6,6 +6,8 @@ Susgee History is a simple web tool for reading recent messages from a Twitch ch
 - Clean and easy-to-read interface
 - No message storage - uses live API data
 - Lightweight and straightforward
+- **NEW**: Support for custom message providers and limits
+- **NEW**: Advanced options for power users
 
 ## Prerequisites
 - Node.js (version 18 or later)
@@ -31,6 +33,31 @@ The application will be available at (or the port specified in your configuratio
 1. Open the application
 2. Enter a Twitch channel name
 3. View recent chat messages in a clean, readable format
+
+### Advanced Usage
+You can customize the message provider and limit using URL parameters:
+
+#### URL Format
+```
+https://history.susgee.dev/[channel]?provider=[provider-url]&limit=[message-count]
+```
+
+#### Examples
+- Default usage: `https://history.susgee.dev/forsen`
+- Custom provider: `https://history.susgee.dev/forsen?provider=https://recent-messages.zneix.eu/api/v2/recent-messages/`
+- Custom limit: `https://history.susgee.dev/forsen?limit=10000`
+- Both: `https://history.susgee.dev/forsen?provider=https://recent-messages.zneix.eu/api/v2/recent-messages/&limit=10000`
+
+#### Advanced Options in UI
+1. Click "Show Advanced Options" on the search page
+2. Enter a custom provider URL (optional)
+3. Set a custom message limit (1-50,000, optional)
+4. Submit to load messages with your custom settings
+
+#### Supported Providers
+- Default: `https://recent-messages.robotty.de/api/v2/recent-messages/`
+- Alternative: `https://recent-messages.zneix.eu/api/v2/recent-messages/`
+- Any other compatible recent-messages API endpoint
 
 ## Technologies
 - Next.js

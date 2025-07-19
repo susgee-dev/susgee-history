@@ -15,8 +15,8 @@ export async function fetchChannelData(
 	}
 
 	// Validate options
-	if (options?.limit && (options.limit < 1 || options.limit > 50000)) {
-		throw new Error('Limit must be between 1 and 50,000');
+	if (options?.limit && (options.limit < 1 || options.limit > 1000)) {
+		throw new Error('Limit must be between 1 and 1,000');
 	}
 
 	if (options?.provider) {

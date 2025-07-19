@@ -227,7 +227,7 @@ export default function SearchChannel() {
 						</label>
 						<input
 							className="w-full rounded border border-primary/20 bg-transparent px-3 py-2 text-sm text-font placeholder-font/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/60"
-							max="50000"
+							max="1000"
 							min="1"
 							placeholder="800"
 							type="number"
@@ -235,7 +235,7 @@ export default function SearchChannel() {
 							onChange={(e) => setLimit(e.target.value)}
 						/>
 						<p className="text-xs text-primary/60">
-							Default: 800, Max: 50,000
+							Default: 800, Max: 1,000
 						</p>
 					</div>
 				</motion.div>

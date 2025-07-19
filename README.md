@@ -45,13 +45,13 @@ https://history.susgee.dev/[channel]?provider=[provider-url]&limit=[message-coun
 #### Examples
 - Default usage: `https://history.susgee.dev/forsen`
 - Custom provider: `https://history.susgee.dev/forsen?provider=https://recent-messages.zneix.eu/api/v2/recent-messages/`
-- Custom limit: `https://history.susgee.dev/forsen?limit=10000`
-- Both: `https://history.susgee.dev/forsen?provider=https://recent-messages.zneix.eu/api/v2/recent-messages/&limit=10000`
+- Custom limit: `https://history.susgee.dev/forsen?limit=10`
+- Both: `https://history.susgee.dev/forsen?provider=https://recent-messages.zneix.eu/api/v2/recent-messages/&limit=100`
 
 #### Advanced Options in UI
 1. Click "Show Advanced Options" on the search page
 2. Enter a custom provider URL (optional)
-3. Set a custom message limit (1-50,000, optional)
+3. Set a custom message limit (1-1,000, optional)
 4. Submit to load messages with your custom settings
 
 #### Supported Providers

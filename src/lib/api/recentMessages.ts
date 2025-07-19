@@ -23,7 +23,7 @@ class RecentMessages extends BaseApi {
 
 		// Build the full URL directly instead of changing basePath
 		const fullUrl = `${provider}${channel}?limit=${limit}`;
-		
+
 		try {
 			const response = await fetch(fullUrl, {
 				method: 'GET',
@@ -41,14 +41,14 @@ class RecentMessages extends BaseApi {
 				return [];
 			}
 
-			const data = await response.json() as RecentMessagesResponse;
+			const data = (await response.json()) as RecentMessagesResponse;
 
 			if (!data) {
 				return [];
 			}
 
 			return data.messages || [];
-		} catch (error) {
+		} catch {
 			return [];
 		}
 	}

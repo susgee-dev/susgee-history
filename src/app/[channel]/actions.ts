@@ -7,7 +7,7 @@ import parser from '@/lib/parser';
 import { Cosmetics, ParsedMessage } from '@/types/message';
 
 export async function fetchChannelData(
-	channel: string, 
+	channel: string,
 	options?: { provider?: string; limit?: number }
 ) {
 	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
@@ -21,7 +21,8 @@ export async function fetchChannelData(
 
 	if (options?.provider) {
 		try {
-			const url = new URL(options.provider);
+			new URL(options.provider);
+
 			// Ensure the URL ends with a slash
 			if (!options.provider.endsWith('/')) {
 				options.provider = options.provider + '/';

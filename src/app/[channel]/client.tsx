@@ -1,7 +1,7 @@
 'use client';
 
-import { Fragment, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Fragment, useEffect, useState } from 'react';
 
 import { fetchChannelData } from './actions';
 
@@ -20,7 +20,7 @@ import {
 	UserNoticeMessage
 } from '@/types/message';
 
-export default function ChannelPageClient({ channel }: { channel: string }) {
+export default function ClientPage({ channel }: { channel: string }) {
 	const [parsed, setParsed] = useState<ParsedMessage[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +38,10 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 					...(limit && { limit })
 				};
 
-				const messages = await fetchChannelData(channel, Object.keys(options).length > 0 ? options : undefined);
+				const messages = await fetchChannelData(
+					channel,
+					Object.keys(options).length > 0 ? options : undefined
+				);
 
 				setParsed(messages);
 			} catch {

@@ -28,7 +28,9 @@ export default function SearchChannel() {
 
 	const [inputValue, setInputValue] = useState('');
 	const [showAdvanced, setShowAdvanced] = useState(false);
-	const [selectedProvider, setSelectedProvider] = useState('https://recent-messages.robotty.de/api/v2/recent-messages/');
+	const [selectedProvider, setSelectedProvider] = useState(
+		'https://recent-messages.robotty.de/api/v2/recent-messages/'
+	);
 	const [customProvider, setCustomProvider] = useState('');
 	const [limit, setLimit] = useState('800');
 	const [showProviderDropdown, setShowProviderDropdown] = useState(false);
@@ -42,6 +44,7 @@ export default function SearchChannel() {
 		};
 
 		document.addEventListener('mousedown', handleClickOutside);
+
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
@@ -60,7 +63,8 @@ export default function SearchChannel() {
 	};
 
 	const getSelectedProviderLabel = () => {
-		const option = PROVIDER_OPTIONS.find(opt => opt.value === selectedProvider);
+		const option = PROVIDER_OPTIONS.find((opt) => opt.value === selectedProvider);
+
 		return option ? `${option.label} - ${option.description}` : 'Select provider';
 	};
 
@@ -70,20 +74,25 @@ export default function SearchChannel() {
 			// Validate custom provider URL if selected
 			if (selectedProvider === 'custom' && !customProvider.trim()) {
 				alert('Please enter a custom provider URL');
+
 				return;
 			}
 
 			const params = new URLSearchParams();
-			
+
 			if (showAdvanced) {
 				let finalProvider = '';
+
 				if (selectedProvider === 'custom') {
 					finalProvider = customProvider;
 				} else {
 					finalProvider = selectedProvider;
 				}
 
-				if (finalProvider && finalProvider !== 'https://recent-messages.robotty.de/api/v2/recent-messages/') {
+				if (
+					finalProvider &&
+					finalProvider !== 'https://recent-messages.robotty.de/api/v2/recent-messages/'
+				) {
 					// Ensure provider URL ends with a slash
 					if (!finalProvider.endsWith('/')) {
 						finalProvider = finalProvider + '/';
@@ -94,9 +103,10 @@ export default function SearchChannel() {
 					params.set('limit', limit);
 				}
 			}
-			
+
 			const queryString = params.toString();
 			const url = queryString ? `/${inputValue}?${queryString}` : `/${inputValue}`;
+
 			router.push(url);
 		}
 	};
@@ -142,10 +152,10 @@ export default function SearchChannel() {
 
 			<motion.button
 				animate={{ opacity: 1 }}
-				className="text-sm text-primary/70 hover:text-primary transition-colors duration-200"
+				className="text-sm text-primary/70 transition-colors duration-200 hover:text-primary"
 				initial={{ opacity: 0 }}
-				onClick={() => setShowAdvanced(!showAdvanced)}
 				transition={{ duration: 0.2 }}
+				onClick={() => setShowAdvanced(!showAdvanced)}
 			>
 				{showAdvanced ? 'Hide' : 'Show'} Advanced Options
 			</motion.button>
@@ -158,39 +168,47 @@ export default function SearchChannel() {
 					transition={{ duration: 0.3 }}
 				>
 					<div className="flex flex-col gap-2">
-						<label className="text-sm font-medium text-primary/80">
+						<label className="text-sm font-medium text-primary/80" htmlFor="provider-dropdown">
 							Provider (optional):
 						</label>
-						<div className="relative" ref={dropdownRef}>
+						<div ref={dropdownRef} className="relative">
 							<button
+								className="flex w-full items-center justify-between rounded border border-primary/20 bg-transparent px-3 py-2 text-left text-sm text-font transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/60"
+								id="provider-dropdown"
 								type="button"
-								className="w-full rounded border border-primary/20 bg-transparent px-3 py-2 text-sm text-font transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/60 text-left flex items-center justify-between"
 								onClick={() => setShowProviderDropdown(!showProviderDropdown)}
 							>
 								<span>{getSelectedProviderLabel()}</span>
 								<svg
-									className={`w-4 h-4 transition-transform duration-200 ${showProviderDropdown ? 'rotate-180' : ''}`}
+									className={`h-4 w-4 transition-transform duration-200 ${showProviderDropdown ? 'rotate-180' : ''}`}
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
 								>
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+									<path
+										d="M19 9l-7 7-7-7"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+									/>
 								</svg>
 							</button>
-							
+
 							{showProviderDropdown && (
 								<motion.div
 									animate={{ opacity: 1, y: 0 }}
+									className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border border-primary/20 bg-primary-dark shadow-lg"
 									initial={{ opacity: 0, y: -10 }}
-									className="absolute top-full left-0 right-0 mt-1 bg-primary-dark border border-primary/20 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto"
 								>
 									{PROVIDER_OPTIONS.map((option) => (
 										<button
 											key={option.value}
-											type="button"
-											className={`w-full px-3 py-2 text-sm text-left hover:bg-primary/20 transition-colors duration-150 ${
-												selectedProvider === option.value ? 'bg-primary/30 text-primary' : 'text-font'
+											className={`w-full px-3 py-2 text-left text-sm transition-colors duration-150 hover:bg-primary/20 ${
+												selectedProvider === option.value
+													? 'bg-primary/30 text-primary'
+													: 'text-font'
 											}`}
+											type="button"
 											onClick={() => handleProviderChange(option.value)}
 										>
 											<div className="font-medium">{option.label}</div>
@@ -204,16 +222,17 @@ export default function SearchChannel() {
 
 					{selectedProvider === 'custom' && (
 						<div className="flex flex-col gap-2">
-							<label className="text-sm font-medium text-primary/80">
+							<label className="text-sm font-medium text-primary/80" htmlFor="custom-provider">
 								Custom Provider URL:
 							</label>
 							<input
+								required
 								className="w-full rounded border border-primary/20 bg-transparent px-3 py-2 text-sm text-font placeholder-font/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/60"
+								id="custom-provider"
 								placeholder="https://your-api-endpoint.com/api/v2/recent-messages/"
 								type="url"
 								value={customProvider}
 								onChange={(e) => setCustomProvider(e.target.value)}
-								required
 							/>
 							<p className="text-xs text-primary/60">
 								Must be a valid recent-messages API endpoint
@@ -222,11 +241,12 @@ export default function SearchChannel() {
 					)}
 
 					<div className="flex flex-col gap-2">
-						<label className="text-sm font-medium text-primary/80">
+						<label className="text-sm font-medium text-primary/80" htmlFor="message-limit">
 							Message Limit (optional):
 						</label>
 						<input
 							className="w-full rounded border border-primary/20 bg-transparent px-3 py-2 text-sm text-font placeholder-font/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/60"
+							id="message-limit"
 							max="1000"
 							min="1"
 							placeholder="800"
@@ -234,9 +254,7 @@ export default function SearchChannel() {
 							value={limit}
 							onChange={(e) => setLimit(e.target.value)}
 						/>
-						<p className="text-xs text-primary/60">
-							Default: 800, Max: 1,000
-						</p>
+						<p className="text-xs text-primary/60">Default: 800, Max: 1,000</p>
 					</div>
 				</motion.div>
 			)}

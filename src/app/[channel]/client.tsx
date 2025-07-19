@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import { fetchChannelData } from './actions';
 
@@ -23,11 +24,21 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 	const [parsed, setParsed] = useState<ParsedMessage[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const searchParams = useSearchParams();
 
 	useEffect(() => {
 		async function loadChannelData() {
 			try {
-				const messages = await fetchChannelData(channel);
+				const provider = searchParams.get('provider');
+				const limitParam = searchParams.get('limit');
+				const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+
+				const options = {
+					...(provider && { provider }),
+					...(limit && { limit })
+				};
+
+				const messages = await fetchChannelData(channel, Object.keys(options).length > 0 ? options : undefined);
 
 				setParsed(messages);
 			} catch {
@@ -38,11 +49,15 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 		}
 
 		loadChannelData().then();
-	}, [channel]);
+	}, [channel, searchParams]);
 
 	if (error) {
 		return <Error message={error} title="Error Loading Channel" type="notFound" />;
 	}
+
+	const provider = searchParams.get('provider');
+	const limit = searchParams.get('limit');
+	const hasCustomSettings = provider || limit;
 
 	return (
 		<>
@@ -56,6 +71,24 @@ export default function ChannelPageClient({ channel }: { channel: string }) {
 					{channel}
 				</Heading>
 			</div>
+
+			{hasCustomSettings && (
+				<div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 p-3">
+					<div className="text-sm text-primary/80">
+						<strong>Custom Settings:</strong>
+						{provider && (
+							<div className="mt-1">
+								Provider: <span className="font-mono text-xs">{provider}</span>
+							</div>
+						)}
+						{limit && (
+							<div className="mt-1">
+								Limit: <span className="font-mono text-xs">{limit} messages</span>
+							</div>
+						)}
+					</div>
+				</div>
+			)}
 
 			{isLoading ? (
 				<div key="loading-state" className="flex items-center justify-center py-16">

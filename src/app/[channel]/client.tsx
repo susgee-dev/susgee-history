@@ -5,13 +5,13 @@ import { Fragment, useEffect, useState } from 'react';
 
 import { fetchChannelData } from './actions';
 
-import ClearChat from '@/components/clear-chat';
 import NewDay from '@/components/fragments/new-day';
-import PrivMessage from '@/components/priv-message';
+import ClearChat from '@/components/message-types/clear-chat';
+import PrivMessage from '@/components/message-types/priv-message';
+import UserNotice from '@/components/message-types/user-notice';
 import Error from '@/components/ui/error';
 import { Heading } from '@/components/ui/heading';
 import { Link } from '@/components/ui/link';
-import UserNotice from '@/components/user-notice';
 import {
 	ClearChatMessage,
 	MessageTypes,

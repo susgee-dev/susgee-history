@@ -167,6 +167,8 @@ class Parser {
 		for (const word of words) {
 			const twitchEmote = twitchEmotes.find((e) => e.start === index);
 
+			index += Array.from(word).length + 1;
+
 			if (twitchEmote) {
 				processed.push({
 					type: 'emote',
@@ -175,7 +177,6 @@ class Parser {
 					aspectRatio: 1,
 					url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
 				});
-				index += word.length + 1;
 				continue;
 			}
 
@@ -189,18 +190,15 @@ class Parser {
 					aspectRatio: stvEmote.aspectRatio,
 					url: `https://cdn.7tv.app/emote/${stvEmote.id}/1x.webp`
 				});
-				index += word.length + 1;
 				continue;
 			}
 
 			if (/^https?:\/\//.test(word)) {
 				processed.push({ type: 'link', content: word, url: word });
-				index += word.length + 1;
 				continue;
 			}
 
 			processed.push({ type: 'text', content: word });
-			index += word.length + 1;
 		}
 
 		return processed;

@@ -86,7 +86,11 @@ export default function SearchChannel() {
 		return selectedProvider;
 	};
 
-	const createCustomUrl = (inputValue: string, providerUrl?: string, limit?: string) => {
+	const createCustomUrl = (
+		inputValue: string,
+		providerUrl: null | string,
+		limit: null | string
+	) => {
 		const baseUrl = `/${inputValue}`;
 
 		if (!providerUrl && !limit) return baseUrl;
@@ -105,12 +109,10 @@ export default function SearchChannel() {
 
 		const providerUrl = getProviderUrl();
 
-		if (providerUrl === null) return;
-
 		const url = createCustomUrl(
 			inputValue,
-			providerUrl,
-			showAdvanced && limit !== DEFAULT_LIMIT ? limit : undefined
+			providerUrl || null,
+			showAdvanced && limit !== DEFAULT_LIMIT ? limit : null
 		);
 
 		router.push(url, { scroll: false });

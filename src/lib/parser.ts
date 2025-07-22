@@ -55,19 +55,32 @@ class Parser {
 	}
 
 	private parseRaw(raw: string): Omit<ParsedIRC, 'cosmetics'> | null {
-		const match = raw.match(/^(?:@([^ ]+) )?(?::([^ ]+) )?([A-Z]+) (.+)$/);
+		if (raw.length < 4) return null;
 
-		if (!match) return null;
+		const hasTag = raw.charAt(0) === '@';
+		const tagStart = hasTag ? raw.indexOf(' ') : -1;
 
-		const [, tagsStr = '', prefix = '', cmd, rest] = match;
+		const prefixStart = raw.indexOf(':', tagStart + 1);
+		const cmdStart = prefixStart !== -1 ? raw.indexOf(' ', prefixStart) : hasTag ? tagStart : 0;
 
-		const tags = new Map(
-			tagsStr.split(';').map((tag) => {
+		const tagsStr = hasTag ? raw.slice(1, tagStart).trim() : '';
+		const prefix = prefixStart !== -1 ? raw.slice(prefixStart + 1, cmdStart).trim() : '';
+
+		const cmdAndRest = raw.slice(cmdStart + 1).trim();
+		const spaceIndex = cmdAndRest.indexOf(' ');
+
+		const cmd = spaceIndex === -1 ? cmdAndRest : cmdAndRest.slice(0, spaceIndex);
+		const rest = spaceIndex === -1 ? '' : cmdAndRest.slice(spaceIndex + 1);
+
+		const tags = new Map<string, string>();
+
+		if (tagsStr) {
+			for (const tag of tagsStr.split(';')) {
 				const [key, value = ''] = tag.split('=');
 
-				return [key, this.safeDecode(value) || ''];
-			})
-		);
+				tags.set(key, this.safeDecode(value));
+			}
+		}
 
 		return { cmd, tags, prefix, rest };
 	}

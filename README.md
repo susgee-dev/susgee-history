@@ -13,6 +13,7 @@ format.
 - **NEW**: Support for custom message providers and limits
 - **NEW**: Advanced options for power users
 - **NEW**: Reverse order of messages
+- **NEW**: Support for direct logs URLs
 
 ## Prerequisites
 
@@ -50,35 +51,55 @@ The application will be available at (or the port specified in your configuratio
 
 ### Advanced Usage
 
-You can customize the message provider and limit using URL parameters:
+You can customize the message provider, channel, limit, and more using URL parameters:
 
 #### URL Format
 
 ```
-https://history.susgee.dev/[channel]?provider=[provider-url]&limit=[message-count]&reverse
+https://emotes.susgee.dev/?c=[channel]&provider=[provider-url]&limit=[message-count]&reverse&url=[direct-logs-url]
 ```
+
+#### Parameters
+
+- `c`: The channel name (e.g., `forsen`)
+- `provider`: A custom provider URL (e.g., `https://recent-messages.zneix.eu/api/v2/recent-messages/`)
+- `limit`: Maximum number of messages to fetch (e.g., `100`)
+- `reverse`: Include this parameter to show oldest messages first
+- `url`: A direct logs URL (e.g., `https://logs.susgee.dev/channel/channelname/user/username/2025/7`)
+
+#### Priority
+
+- If `c` (channel) parameter is set, it will use the default or specified provider with that channel
+- If `c` is not set but `url` is set, it will fetch logs directly from the URL
+- If neither `c` nor `url` is set, it will display the search form
 
 #### Examples
 
-- Default usage: `https://history.susgee.dev/forsen`
-- Custom provider: `https://history.susgee.dev/forsen?provider=https://recent-messages.zneix.eu/api/v2/recent-messages/`
-- Custom limit: `https://history.susgee.dev/forsen?limit=10`
-- Reverse order: `https://history.susgee.dev/forsen?reverse`
-- Both: `https://history.susgee.dev/forsen?provider=https://recent-messages.zneix.eu/api/v2/recent-messages/&limit=100`
+- Default usage: `https://emotes.susgee.dev/?c=forsen`
+- Custom provider: `https://emotes.susgee.dev/?c=forsen&provider=https://recent-messages.zneix.eu/api/v2/recent-messages/`
+- Custom limit: `https://emotes.susgee.dev/?c=forsen&limit=10`
+- Reverse order: `https://emotes.susgee.dev/?c=forsen&reverse`
+- Direct logs URL: `https://emotes.susgee.dev/?url=https://logs.susgee.dev/channel/channelname/user/username/2025/7`
+- Combined options: `https://emotes.susgee.dev/?c=forsen&provider=https://recent-messages.zneix.eu/api/v2/recent-messages/&limit=100&reverse`
+
+> Note: The old URL format (`/[channel]?provider=...`) will still work and will be automatically redirected to the new format with the root path.
 
 #### Advanced Options in UI
 
 1. Click "Show Advanced Options" on the search page
-2. Enter a custom provider URL (optional)
-3. Set a custom message limit (e.g. 10000, optional)
-4. Reverse the order of messages
-5. Submit to load messages with your custom settings
+2. Select a provider from the dropdown or choose "Direct Logs URL" for direct log URLs
+3. Enter a custom provider URL or direct logs URL (if applicable)
+4. Set a custom message limit (e.g. 10000, optional)
+5. Reverse the order of messages (optional)
+6. Submit to load messages with your custom settings
 
 #### Supported Providers
 
 - Robotty (default): `https://recent-messages.robotty.de/api/v2/recent-messages/`
 - Zneix: `https://recent-messages.zneix.eu/api/v2/recent-messages/`
 - Zonian: `https://logs.zonian.dev/rm/`
+- Direct Logs URL: Any URL that provides raw IRC data (e.g.,
+  `https://logs.susgee.dev/channel/channelname/user/username/2025/7`)
 - Any other compatible recent-messages API endpoint
 
 ## Technologies

@@ -1,33 +1,20 @@
-import { Metadata } from 'next';
-
-import ClientPage from './client';
+import { redirect } from 'next/navigation';
 
 type PageParams = {
 	params: Promise<{ channel: string }>;
+	searchParams: Record<string, string | string[]>;
 };
 
-export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
+export default async function ChannelPage({ params, searchParams }: PageParams) {
 	const { channel } = await params;
 
-	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
-		return {
-			title: 'Invalid Channel',
-			description: 'Please enter a valid Twitch channel name'
-		};
-	}
+	const existingParams = new URLSearchParams(
+		Object.entries(searchParams).flatMap(([key, value]) =>
+			value instanceof Array ? value.map((v) => [key, v]) : [[key, value]]
+		)
+	);
 
-	return {
-		title: `${channel}'s Twitch Chat History`,
-		description: `Recent chat messages from Twitch channel ${channel}`,
-		openGraph: {
-			title: `${channel} - Twitch Chat History`,
-			description: `View recent chat messages from ${channel}'s Twitch channel`
-		}
-	};
-}
+	existingParams.set('c', channel);
 
-export default async function ChannelPage({ params }: PageParams) {
-	const { channel } = await params;
-
-	return <ClientPage channel={channel} />;
+	redirect(`/?${existingParams.toString()}`);
 }

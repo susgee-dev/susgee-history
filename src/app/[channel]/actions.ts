@@ -9,7 +9,7 @@ import { Cosmetics, ParsedMessage } from '@/types/message';
 
 export async function fetchChannelData(
 	channel: string,
-	options?: { provider?: string; limit?: number }
+	options?: { provider?: string; limit?: number; reverse?: boolean }
 ) {
 	if (!channel || channel.length > 25 || !/^[a-zA-Z0-9_]{3,25}$/.test(channel)) {
 		throw new Error('Invalid channel name');
@@ -54,10 +54,15 @@ export async function fetchChannelData(
 		}
 	};
 
-	return (
+	let processedMessages =
 		messages
 			?.map((msg: string) => parser.process(msg, cosmetics))
-			?.filter((msg): msg is ParsedMessage => !!msg)
-			.reverse() || []
-	);
+			?.filter((msg): msg is ParsedMessage => !!msg) || [];
+	const shouldReverse = options?.reverse === undefined ? provider.defaultReverseOrder : false;
+
+	if (shouldReverse) {
+		processedMessages = processedMessages.reverse();
+	}
+
+	return processedMessages;
 }

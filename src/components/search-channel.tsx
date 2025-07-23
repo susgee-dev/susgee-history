@@ -4,33 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 
+import provider from '@/lib/providers';
 import { cn } from '@/lib/utils';
-
-const DEFAULT_PROVIDER = 'https://recent-messages.robotty.de/api/v2/recent-messages/';
-const DEFAULT_LIMIT = '800';
-
-const PROVIDER_OPTIONS = [
-	{
-		label: 'Robotty (Default)',
-		value: DEFAULT_PROVIDER,
-		description: 'recent-messages.robotty.de'
-	},
-	{
-		label: 'Zneix',
-		value: 'https://recent-messages.zneix.eu/api/v2/recent-messages/',
-		description: 'recent-messages.zneix.eu'
-	},
-	{
-		label: 'Zonian',
-		value: 'https://logs.zonian.dev/rm/',
-		description: 'logs.zonian.dev'
-	},
-	{
-		label: 'Custom URL',
-		value: 'custom',
-		description: 'Enter your own API endpoint'
-	}
-];
 
 export default function SearchChannel() {
 	const router = useRouter();
@@ -38,9 +13,9 @@ export default function SearchChannel() {
 
 	const [inputValue, setInputValue] = useState('');
 	const [showAdvanced, setShowAdvanced] = useState(false);
-	const [selectedProvider, setSelectedProvider] = useState(DEFAULT_PROVIDER);
+	const [selectedProvider, setSelectedProvider] = useState(provider.defaultProvider as string);
 	const [customProvider, setCustomProvider] = useState('');
-	const [limit, setLimit] = useState(DEFAULT_LIMIT);
+	const [limit, setLimit] = useState(provider.defaultLimit);
 	const [showProviderDropdown, setShowProviderDropdown] = useState(false);
 
 	useEffect(() => {
@@ -64,13 +39,13 @@ export default function SearchChannel() {
 	const handleProviderChange = (value: string) => {
 		setSelectedProvider(value);
 		setShowProviderDropdown(false);
-		if (value !== 'custom') {
+		if (value !== provider.providers.CUSTOM) {
 			setCustomProvider('');
 		}
 	};
 
 	const getSelectedProviderLabel = () => {
-		const option = PROVIDER_OPTIONS.find((opt) => opt.value === selectedProvider);
+		const option = provider.options.find((opt) => opt.value === selectedProvider);
 
 		return option ? `${option.label} - ${option.description}` : 'Select provider';
 	};
@@ -78,23 +53,13 @@ export default function SearchChannel() {
 	const getProviderUrl = (): string | null => {
 		if (!showAdvanced) return null;
 
-		if (selectedProvider === DEFAULT_PROVIDER) return null;
-
-		if (selectedProvider === 'custom') {
-			if (!customProvider.trim()) {
-				return DEFAULT_PROVIDER;
-			}
-
-			return customProvider;
-		}
-
-		return selectedProvider;
+		return provider.getUrl(selectedProvider, customProvider);
 	};
 
 	const createCustomUrl = (
 		inputValue: string,
 		providerUrl: null | string,
-		limit: null | string
+		limit: null | number
 	) => {
 		const baseUrl = `/${inputValue}`;
 
@@ -103,7 +68,7 @@ export default function SearchChannel() {
 		const params: string[] = [];
 
 		if (providerUrl) params.push(`provider=${providerUrl}`);
-		if (limit && limit !== DEFAULT_LIMIT) params.push(`limit=${limit}`);
+		if (limit && limit !== provider.defaultLimit) params.push(`limit=${limit}`);
 
 		return `${baseUrl}?${params.join('&')}`;
 	};
@@ -117,7 +82,7 @@ export default function SearchChannel() {
 		const url = createCustomUrl(
 			inputValue,
 			providerUrl || null,
-			showAdvanced && limit !== DEFAULT_LIMIT ? limit : null
+			showAdvanced && limit !== provider.defaultLimit ? limit : null
 		);
 
 		router.push(url, { scroll: false });
@@ -230,12 +195,12 @@ export default function SearchChannel() {
 									{showProviderDropdown && (
 										<motion.div
 											animate={{ opacity: 1, scale: 1 }}
-											className="absolute left-0 right-0 top-full z-10 mt-1 max-h-48 origin-top overflow-y-auto rounded-lg border border-primary/20 bg-primary-dark shadow-lg"
+											className="absolute left-0 right-0 top-full z-10 mt-1 max-h-56 origin-top overflow-y-auto rounded-lg border border-primary/20 bg-primary-dark shadow-lg"
 											exit={{ opacity: 0, scale: 0.97 }}
 											initial={{ opacity: 0, scale: 0.97 }}
 											transition={{ duration: 0.2, ease: 'easeInOut' }}
 										>
-											{PROVIDER_OPTIONS.map((option) => (
+											{provider.options.map((option) => (
 												<button
 													key={option.value}
 													className={cn(
@@ -255,7 +220,7 @@ export default function SearchChannel() {
 							</div>
 						</div>
 
-						{selectedProvider === 'custom' && (
+						{selectedProvider === provider.providers.CUSTOM && (
 							<div className="flex flex-col gap-2">
 								<label className="text-sm font-medium text-primary/80" htmlFor="custom-provider">
 									Custom Provider URL:
@@ -291,10 +256,10 @@ export default function SearchChannel() {
 								)}
 								id="message-limit"
 								min="1"
-								placeholder={DEFAULT_LIMIT}
+								placeholder={provider.defaultLimit?.toString()}
 								type="number"
 								value={limit}
-								onChange={(e) => setLimit(e.target.value)}
+								onChange={(e) => setLimit(Number(e.target.value))}
 							/>
 						</div>
 					</motion.div>

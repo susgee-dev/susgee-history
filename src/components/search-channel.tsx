@@ -66,15 +66,12 @@ export default function SearchChannel() {
 	) => {
 		const params: string[] = [];
 
-		// Check if this is a direct logs URL
 		const isDirectLogsUrl =
 			selectedProvider === provider.providers.DIRECT_LOGS && customProvider.trim();
 
 		if (isDirectLogsUrl) {
-			// For direct logs URLs, use the url parameter
 			params.push(`url=${encodeURIComponent(customProvider.trim())}`);
 		} else if (inputValue) {
-			// For channel-based logs, use the c parameter
 			params.push(`c=${inputValue}`);
 		}
 
@@ -88,11 +85,9 @@ export default function SearchChannel() {
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		// For direct logs URL, we don't need a channel name
 		const isDirectLogsUrl =
 			selectedProvider === provider.providers.DIRECT_LOGS && customProvider.trim();
 
-		// Only require channel name for non-direct logs URLs
 		if (!isDirectLogsUrl && !inputValue) return;
 
 		const providerUrl = getProviderUrl();
@@ -125,7 +120,6 @@ export default function SearchChannel() {
 							'w-full rounded-lg border border-primary/30 bg-transparent px-4 py-2',
 							'text-font placeholder-font/50 transition-all duration-300',
 							'focus:outline-none focus:ring-2 focus:ring-primary/60',
-							// Add a visual indicator when the field is optional
 							showAdvanced &&
 								selectedProvider === provider.providers.DIRECT_LOGS &&
 								customProvider.trim()
@@ -155,7 +149,6 @@ export default function SearchChannel() {
 						'disabled:pointer-events-none disabled:!opacity-50'
 					)}
 					disabled={
-						// Enable button if using direct logs URL with a valid URL
 						!(
 							inputValue ||
 							(showAdvanced &&

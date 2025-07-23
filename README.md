@@ -56,7 +56,7 @@ You can customize the message provider, channel, limit, and more using URL param
 #### URL Format
 
 ```
-https://emotes.susgee.dev/?c=[channel]&provider=[provider-url]&limit=[message-count]&reverse&url=[direct-logs-url]
+https://history.susgee.dev/?c=[channel]&provider=[provider-url]&limit=[message-count]&reverse&url=[direct-logs-url]
 ```
 
 #### Parameters
@@ -75,14 +75,17 @@ https://emotes.susgee.dev/?c=[channel]&provider=[provider-url]&limit=[message-co
 
 #### Examples
 
-- Default usage: `https://emotes.susgee.dev/?c=forsen`
-- Custom provider: `https://emotes.susgee.dev/?c=forsen&provider=https://recent-messages.zneix.eu/api/v2/recent-messages/`
-- Custom limit: `https://emotes.susgee.dev/?c=forsen&limit=10`
-- Reverse order: `https://emotes.susgee.dev/?c=forsen&reverse`
-- Direct logs URL: `https://emotes.susgee.dev/?url=https://logs.susgee.dev/channel/channelname/user/username/2025/7`
-- Combined options: `https://emotes.susgee.dev/?c=forsen&provider=https://recent-messages.zneix.eu/api/v2/recent-messages/&limit=100&reverse`
+- Default usage: `https://history.susgee.dev/?c=forsen`
+- Custom provider:
+  `https://history.susgee.dev/?c=forsen&provider=https://recent-messages.zneix.eu/api/v2/recent-messages/`
+- Custom limit: `https://history.susgee.dev/?c=forsen&limit=10`
+- Reverse order: `https://history.susgee.dev/?c=forsen&reverse`
+- Direct logs URL: `https://history.susgee.dev/?url=https://logs.susgee.dev/channel/channelname/user/username/2025/7`
+- Combined options:
+  `https://history.susgee.dev/?c=forsen&provider=https://recent-messages.zneix.eu/api/v2/recent-messages/&limit=1000&reverse`
 
-> Note: The old URL format (`/[channel]?provider=...`) will still work and will be automatically redirected to the new format with the root path.
+> Note: The old URL format (`/[channel]?provider=...`) will still work and will be automatically redirected to the new
+> format with the root path.
 
 #### Advanced Options in UI
 

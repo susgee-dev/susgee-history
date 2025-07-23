@@ -11,14 +11,19 @@ const DEFAULT_LIMIT = '800';
 
 const PROVIDER_OPTIONS = [
 	{
-		label: 'Default (Robotty)',
+		label: 'Robotty (Default)',
 		value: DEFAULT_PROVIDER,
 		description: 'recent-messages.robotty.de'
 	},
 	{
-		label: 'Alternative (Zneix)',
+		label: 'Zneix',
 		value: 'https://recent-messages.zneix.eu/api/v2/recent-messages/',
 		description: 'recent-messages.zneix.eu'
+	},
+	{
+		label: 'Zonian',
+		value: 'https://logs.zonian.dev/rm/',
+		description: 'logs.zonian.dev'
 	},
 	{
 		label: 'Custom URL',
@@ -291,7 +296,6 @@ export default function SearchChannel() {
 								value={limit}
 								onChange={(e) => setLimit(e.target.value)}
 							/>
-							<p className="text-xs text-primary/60">Default: {DEFAULT_LIMIT}</p>
 						</div>
 					</motion.div>
 				)}

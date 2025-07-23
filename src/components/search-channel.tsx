@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 
+import { Checkbox } from '@/components/ui/checkbox';
 import provider from '@/lib/providers';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +17,7 @@ export default function SearchChannel() {
 	const [selectedProvider, setSelectedProvider] = useState(provider.defaultProvider as string);
 	const [customProvider, setCustomProvider] = useState('');
 	const [limit, setLimit] = useState(provider.defaultLimit);
+	const [reverseOrder, setReverseOrder] = useState(false);
 	const [showProviderDropdown, setShowProviderDropdown] = useState(false);
 
 	useEffect(() => {
@@ -59,16 +61,18 @@ export default function SearchChannel() {
 	const createCustomUrl = (
 		inputValue: string,
 		providerUrl: null | string,
-		limit: null | number
+		limit: null | number,
+		reverse: boolean | null
 	) => {
 		const baseUrl = `/${inputValue}`;
 
-		if (!providerUrl && !limit) return baseUrl;
+		if (!providerUrl && !limit && reverse === null) return baseUrl;
 
 		const params: string[] = [];
 
 		if (providerUrl) params.push(`provider=${providerUrl}`);
 		if (limit && limit !== provider.defaultLimit) params.push(`limit=${limit}`);
+		if (reverse === true) params.push(`reverse`);
 
 		return `${baseUrl}?${params.join('&')}`;
 	};
@@ -82,7 +86,8 @@ export default function SearchChannel() {
 		const url = createCustomUrl(
 			inputValue,
 			providerUrl || null,
-			showAdvanced && limit !== provider.defaultLimit ? limit : null
+			showAdvanced && limit !== provider.defaultLimit ? limit : null,
+			showAdvanced ? reverseOrder : null
 		);
 
 		router.push(url, { scroll: false });
@@ -260,6 +265,15 @@ export default function SearchChannel() {
 								type="number"
 								value={limit}
 								onChange={(e) => setLimit(Number(e.target.value))}
+							/>
+						</div>
+
+						<div className="flex items-center">
+							<Checkbox
+								checked={reverseOrder}
+								id="reverse-order"
+								label="Reverse Message Order (oldest first)"
+								onChange={(checked) => setReverseOrder(checked)}
 							/>
 						</div>
 					</motion.div>

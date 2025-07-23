@@ -32,10 +32,12 @@ export default function ClientPage({ channel }: { channel: string }) {
 				const provider = searchParams.get('provider');
 				const limitParam = searchParams.get('limit');
 				const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+				const reverseParam = searchParams.get('reverse');
 
 				const options = {
 					...(provider && { provider }),
-					...(limit && { limit })
+					...(limit && { limit }),
+					...(reverseParam !== null && { reverse: true })
 				};
 
 				const messages = await fetchChannelData(
@@ -60,7 +62,8 @@ export default function ClientPage({ channel }: { channel: string }) {
 
 	const provider = searchParams.get('provider');
 	const limit = searchParams.get('limit');
-	const hasCustomSettings = provider || limit;
+	const reverseParam = searchParams.get('reverse');
+	const hasCustomSettings = provider || limit || reverseParam;
 
 	return (
 		<>
@@ -87,6 +90,11 @@ export default function ClientPage({ channel }: { channel: string }) {
 						{limit && (
 							<div className="mt-1">
 								Limit: <span className="font-mono text-xs">{limit} messages</span>
+							</div>
+						)}
+						{reverseParam !== null && (
+							<div className="mt-1">
+								Reverse Order: <span className="font-mono text-xs">Yes</span>
 							</div>
 						)}
 					</div>

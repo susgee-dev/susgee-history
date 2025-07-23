@@ -14,11 +14,13 @@ class Providers {
 
 	readonly defaultProvider: string;
 	readonly defaultLimit: number;
+	readonly defaultReverseOrder: boolean;
 	readonly options: ProviderOption[];
 
 	constructor() {
 		this.defaultProvider = this.providers.ROBOTTY;
 		this.defaultLimit = 800;
+		this.defaultReverseOrder = true;
 
 		this.options = [
 			{

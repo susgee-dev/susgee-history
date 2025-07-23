@@ -227,7 +227,7 @@ export default function SearchChannel() {
 									{showProviderDropdown && (
 										<motion.div
 											animate={{ opacity: 1, scale: 1 }}
-											className="absolute left-0 right-0 top-full z-10 mt-1 max-h-56 origin-top overflow-y-auto rounded-lg border border-primary/20 bg-primary-dark shadow-lg"
+											className="absolute left-0 right-0 top-full z-10 mt-1 origin-top overflow-y-auto rounded-lg border border-primary/20 bg-primary-dark shadow-lg"
 											exit={{ opacity: 0, scale: 0.97 }}
 											initial={{ opacity: 0, scale: 0.97 }}
 											transition={{ duration: 0.2, ease: 'easeInOut' }}

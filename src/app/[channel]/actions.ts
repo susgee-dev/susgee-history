@@ -4,6 +4,7 @@ import sevenTV from '@/lib/api/7tv';
 import helix from '@/lib/api/helix';
 import recentMessages from '@/lib/api/recentMessages';
 import parser from '@/lib/parser';
+import provider from '@/lib/providers';
 import { Cosmetics, ParsedMessage } from '@/types/message';
 
 export async function fetchChannelData(
@@ -19,14 +20,12 @@ export async function fetchChannelData(
 	}
 
 	if (options?.provider) {
-		try {
-			new URL(options.provider);
+		const validatedUrl = provider.validateUrl(options.provider);
 
-			if (!options.provider.endsWith('/')) {
-				options.provider = options.provider + '/';
-			}
-		} catch {
+		if (!validatedUrl) {
 			delete options.provider;
+		} else {
+			options.provider = validatedUrl;
 		}
 	}
 

@@ -278,6 +278,8 @@ class Parser {
 		const messageContent = rest.match(/#[^ ]+ ?:?(.*)$/)?.[1].trim() || '';
 
 		const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics);
+
+		cosmetics.twitch.emotes = baseMessage.emotes;
 		const text = messageContent ? this.processText(messageContent, cosmetics) : [];
 
 		const systemMsg = tags.get('system-msg')?.replaceAll('\\s', ' ') || '';

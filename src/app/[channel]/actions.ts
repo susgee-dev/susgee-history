@@ -14,21 +14,19 @@ export async function fetchChannelData(
 		throw new Error('Invalid channel name');
 	}
 
-	// Validate options
-	if (options?.limit && (options.limit < 1 || options.limit > 1000)) {
-		throw new Error('Limit must be between 1 and 1,000');
+	if (options?.limit && options.limit <= 1) {
+		delete options.limit;
 	}
 
 	if (options?.provider) {
 		try {
 			new URL(options.provider);
 
-			// Ensure the URL ends with a slash
 			if (!options.provider.endsWith('/')) {
 				options.provider = options.provider + '/';
 			}
 		} catch {
-			throw new Error('Invalid provider URL');
+			delete options.provider;
 		}
 	}
 

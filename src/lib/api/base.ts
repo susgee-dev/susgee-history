@@ -28,4 +28,25 @@ export default class BaseApi {
 
 		return await response.json();
 	}
+
+	async fetchText(endpoint: string, options: ApiRequestOptions = {}): Promise<null | string> {
+		const response = await fetch(this.basePath + endpoint, {
+			method: 'GET',
+			headers: {
+				'User-Agent': 'Susgeebot History (https://github.com/susgee-dev/susgee-history)',
+				...(options.headers || {})
+			},
+			...options
+		});
+
+		if (!response.ok) {
+			return null;
+		}
+
+		if (response.status === 204) {
+			return null;
+		}
+
+		return await response.text();
+	}
 }

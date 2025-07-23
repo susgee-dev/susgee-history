@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 
-import SearchChannel from '@/components/search-channel';
-import { Heading } from '@/components/ui/heading';
+import RootClient from '@/components/root-client';
 
 export const metadata: Metadata = {
 	title: 'Twitch history',
@@ -10,11 +10,8 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
 	return (
-		<div className="flex flex-col gap-8 pt-16">
-			<Heading as="h1" variant="compact">
-				Twitch Channel History
-			</Heading>
-			<SearchChannel />
-		</div>
+		<Suspense fallback={<div>Loading...</div>}>
+			<RootClient />
+		</Suspense>
 	);
 }

@@ -64,22 +64,31 @@ export default function SearchChannel() {
 		limit: null | number,
 		reverse: boolean | null
 	) => {
-		const baseUrl = `/${inputValue}`;
-
-		if (!providerUrl && !limit && reverse === null) return baseUrl;
-
 		const params: string[] = [];
 
-		if (providerUrl) params.push(`provider=${providerUrl}`);
+		const isDirectLogsUrl =
+			selectedProvider === provider.providers.DIRECT_LOGS && customProvider.trim();
+
+		if (isDirectLogsUrl) {
+			params.push(`url=${encodeURIComponent(customProvider.trim())}`);
+		} else if (inputValue) {
+			params.push(`c=${inputValue}`);
+		}
+
+		if (providerUrl && !isDirectLogsUrl) params.push(`provider=${encodeURIComponent(providerUrl)}`);
 		if (limit && limit !== provider.defaultLimit) params.push(`limit=${limit}`);
 		if (reverse === true) params.push(`reverse`);
 
-		return `${baseUrl}?${params.join('&')}`;
+		return `/?${params.join('&')}`;
 	};
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		if (!inputValue) return;
+
+		const isDirectLogsUrl =
+			selectedProvider === provider.providers.DIRECT_LOGS && customProvider.trim();
+
+		if (!isDirectLogsUrl && !inputValue) return;
 
 		const providerUrl = getProviderUrl();
 
@@ -110,12 +119,23 @@ export default function SearchChannel() {
 						className={cn(
 							'w-full rounded-lg border border-primary/30 bg-transparent px-4 py-2',
 							'text-font placeholder-font/50 transition-all duration-300',
-							'focus:outline-none focus:ring-2 focus:ring-primary/60'
+							'focus:outline-none focus:ring-2 focus:ring-primary/60',
+							showAdvanced &&
+								selectedProvider === provider.providers.DIRECT_LOGS &&
+								customProvider.trim()
+								? 'border-primary/10'
+								: ''
 						)}
 						maxLength={25}
 						minLength={1}
 						name="username"
-						placeholder="Enter Twitch channel name"
+						placeholder={
+							showAdvanced &&
+							selectedProvider === provider.providers.DIRECT_LOGS &&
+							customProvider.trim()
+								? 'Channel name (optional for direct logs)'
+								: 'Enter Twitch channel name'
+						}
 						type="text"
 						value={inputValue}
 						onChange={handleInput}
@@ -128,7 +148,14 @@ export default function SearchChannel() {
 						'transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/60',
 						'disabled:pointer-events-none disabled:!opacity-50'
 					)}
-					disabled={!inputValue}
+					disabled={
+						!(
+							inputValue ||
+							(showAdvanced &&
+								selectedProvider === provider.providers.DIRECT_LOGS &&
+								customProvider.trim())
+						)
+					}
 					initial={{ opacity: 0, scale: 0.95 }}
 					transition={{
 						duration: 0.3,
@@ -225,10 +252,13 @@ export default function SearchChannel() {
 							</div>
 						</div>
 
-						{selectedProvider === provider.providers.CUSTOM && (
+						{(selectedProvider === provider.providers.CUSTOM ||
+							selectedProvider === provider.providers.DIRECT_LOGS) && (
 							<div className="flex flex-col gap-2">
 								<label className="text-sm font-medium text-primary/80" htmlFor="custom-provider">
-									Custom Provider URL:
+									{selectedProvider === provider.providers.CUSTOM
+										? 'Custom Provider URL:'
+										: 'Direct Logs URL:'}
 								</label>
 								<input
 									required
@@ -238,13 +268,19 @@ export default function SearchChannel() {
 										'focus:outline-none focus:ring-2 focus:ring-primary/60'
 									)}
 									id="custom-provider"
-									placeholder="https://your-api-endpoint.com/api/v2/recent-messages/"
+									placeholder={
+										selectedProvider === provider.providers.CUSTOM
+											? 'https://your-api-endpoint.com/api/v2/recent-messages/'
+											: 'https://logs.susgee.dev/channel/channelname/user/username/2025/7'
+									}
 									type="url"
 									value={customProvider}
 									onChange={(e) => setCustomProvider(e.target.value)}
 								/>
 								<p className="text-xs text-primary/60">
-									Must be a valid recent-messages API endpoint
+									{selectedProvider === provider.providers.CUSTOM
+										? 'Must be a valid recent-messages API endpoint'
+										: 'Enter a direct logs URL (will add ?raw if needed)'}
 								</p>
 							</div>
 						)}

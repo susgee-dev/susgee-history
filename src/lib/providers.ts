@@ -9,7 +9,8 @@ class Providers {
 		ROBOTTY: 'https://recent-messages.robotty.de/api/v2/recent-messages/',
 		ZNEIX: 'https://recent-messages.zneix.eu/api/v2/recent-messages/',
 		ZONIAN: 'https://logs.zonian.dev/rm/',
-		CUSTOM: 'custom'
+		CUSTOM: 'custom recent-messages api',
+		DIRECT_LOGS: 'direct logs url'
 	} as const;
 
 	readonly defaultProvider: string;
@@ -42,6 +43,11 @@ class Providers {
 				label: 'Custom URL',
 				value: this.providers.CUSTOM,
 				description: 'Enter your own API endpoint'
+			},
+			{
+				label: 'Logs URL',
+				value: this.providers.DIRECT_LOGS,
+				description: 'Enter a logs URL'
 			}
 		];
 	}
@@ -67,6 +73,14 @@ class Providers {
 			}
 
 			return this.validateUrl(customProvider) || null;
+		}
+
+		if (selectedProvider === this.providers.DIRECT_LOGS) {
+			if (!customProvider?.trim()) {
+				return null;
+			}
+
+			return customProvider.trim();
 		}
 
 		return selectedProvider;

@@ -82,7 +82,7 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 
 			<Badges message={message} />
 
-			<span className="font-semibold" style={{ color: message.color }}>
+			<span className="font-semibold" style={{ color: `hsl(from ${message.color} h s 60%)` }}>
 				{message.bestName}
 				{message.addColon && ':'}{' '}
 			</span>

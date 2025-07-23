@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import RootClient from '@/components/root-client';
 
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-	return <RootClient />;
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<RootClient />
+		</Suspense>
+	);
 }

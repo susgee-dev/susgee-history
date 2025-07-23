@@ -59,12 +59,12 @@ export default function LogsContent({ channel, url, provider, limit, reverse }: 
 		<>
 			<Link href="/">← back to search</Link>
 
-			<div className="mb-4 flex flex-wrap items-end justify-between">
-				<Heading as="h3" variant="compact">
-					recent messages for:
-				</Heading>
+			<div className="flex flex-wrap items-end justify-between">
 				<Heading as="h1" className="gradient-text flex w-fit flex-col" variant="compact">
-					{channel || 'Direct Logs'}
+					{channel || 'Logs'}
+				</Heading>
+				<Heading as="h3" variant="compact">
+					recent messages
 				</Heading>
 			</div>
 

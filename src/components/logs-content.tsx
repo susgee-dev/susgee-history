@@ -69,7 +69,7 @@ export default function LogsContent({ channel, url, provider, limit, reverse }: 
 			</div>
 
 			{hasCustomSettings && (
-				<div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 p-3">
+				<div className="my-4 rounded-lg border border-primary/20 bg-primary/5 p-3">
 					<div className="text-sm text-primary/80">
 						<strong>Custom Settings:</strong>
 						{url && (

@@ -1,29 +1,24 @@
-import { SevenTVEmoteMap } from '@/types/api/7tv';
-import { BadgeMap } from '@/types/api/helix';
-
-export type TwitchBadge = {
-	content: string;
-	url: string;
-};
+import { BadgeMap, TwitchBadge, TwitchIRCEmote } from '@/types/api/helix';
+import { Emotes } from '@/types/emotes';
 
 export type ProcessedWord =
 	| { type: 'text'; content: string }
 	| { type: 'emote'; content: string; id: string; url: string; aspectRatio: number }
 	| { type: 'link'; content: string; url: string };
 
-export type Emote = {
-	emoteId: string;
-	start: number;
-	end: number;
-};
-
 export type Cosmetics = {
 	twitch: {
-		emotes?: Emote[];
+		emotes?: TwitchIRCEmote[];
 		badges: BadgeMap;
 	};
+	betterTtv: {
+		emotes: Emotes;
+	};
+	frankerFazeZ: {
+		emotes: Emotes;
+	};
 	sevenTv: {
-		emotes: SevenTVEmoteMap;
+		emotes: Emotes;
 	};
 };
 
@@ -48,7 +43,7 @@ export interface BaseMessage {
 	bestName: string;
 	color?: string;
 	badges: TwitchBadge[];
-	emotes: Emote[];
+	emotes: TwitchIRCEmote[];
 	isFirstMessage: boolean;
 	text: ProcessedWord[];
 }

@@ -1,17 +1,16 @@
 import logger from '@/lib/logger';
 import { getBestName } from '@/lib/utils';
+import { TwitchBadge, TwitchIRCEmote } from '@/types/api/helix';
 import {
 	BaseMessage,
 	ClearChatMessage,
 	Cosmetics,
-	Emote,
 	MessageContext,
 	MessageTypes,
 	ParsedIRC,
 	ParsedMessage,
 	PrivateMessage,
 	ProcessedWord,
-	TwitchBadge,
 	UserNoticeMessage
 } from '@/types/message';
 
@@ -149,7 +148,7 @@ class Parser {
 			.filter((badge): badge is TwitchBadge => badge !== null);
 	}
 
-	private parseEmotes(emotesStr: string): Emote[] {
+	private parseEmotes(emotesStr: string): TwitchIRCEmote[] {
 		if (!emotesStr) return [];
 
 		return emotesStr.split('/').flatMap((emoteStr) => {
@@ -161,7 +160,8 @@ class Parser {
 				return {
 					emoteId,
 					start,
-					end
+					end,
+					url: `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0`
 				};
 			});
 		});
@@ -173,6 +173,8 @@ class Parser {
 		const processed: ProcessedWord[] = [];
 		const twitchEmotes = cosmetics.twitch.emotes || [];
 		const stvEmotes = cosmetics.sevenTv.emotes;
+		const bttvEmotes = cosmetics.betterTtv.emotes;
+		const ffzEmotes = cosmetics.frankerFazeZ.emotes;
 
 		const words = message.split(' ');
 		let index = 0;
@@ -188,7 +190,7 @@ class Parser {
 					id: twitchEmote.emoteId,
 					content: word,
 					aspectRatio: 1,
-					url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
+					url: twitchEmote.url
 				});
 				continue;
 			}
@@ -201,7 +203,33 @@ class Parser {
 					id: stvEmote.id,
 					content: stvEmote.name,
 					aspectRatio: stvEmote.aspectRatio,
-					url: `https://cdn.7tv.app/emote/${stvEmote.id}/1x.webp`
+					url: stvEmote.url
+				});
+				continue;
+			}
+
+			const bttvEmote = bttvEmotes.get(word);
+
+			if (bttvEmote) {
+				processed.push({
+					type: 'emote',
+					id: bttvEmote.id,
+					content: bttvEmote.name,
+					aspectRatio: bttvEmote.aspectRatio,
+					url: bttvEmote.url
+				});
+				continue;
+			}
+
+			const ffzEmote = ffzEmotes.get(word);
+
+			if (ffzEmote) {
+				processed.push({
+					type: 'emote',
+					id: ffzEmote.id,
+					content: ffzEmote.name,
+					aspectRatio: ffzEmote.aspectRatio,
+					url: ffzEmote.url
 				});
 				continue;
 			}

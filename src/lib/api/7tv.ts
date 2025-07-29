@@ -1,6 +1,7 @@
 import BaseApi from './base';
 
-import { SevenTVEmoteMap } from '@/types/api/7tv';
+import { SevenTVResponse } from '@/types/api/7tv';
+import { Emotes } from '@/types/emotes';
 
 class SevenTV extends BaseApi {
 	private globalEmoteSetId: string = '01HKQT8EWR000ESSWF3625XCS4';
@@ -9,7 +10,7 @@ class SevenTV extends BaseApi {
 		super('https://7tv.io/v4/gql');
 	}
 
-	async getEmotes(twitchId: string): Promise<SevenTVEmoteMap> {
+	async getEmotes(twitchId: string): Promise<Emotes> {
 		const query = `{
 			emoteSets {
 				emoteSet (id: "${this.globalEmoteSetId}") {
@@ -43,20 +44,21 @@ class SevenTV extends BaseApi {
 			}
     }`;
 
-		const response = await super.fetch<any>('', {
+		const response = await super.fetch<SevenTVResponse>('', {
 			method: 'POST',
 			body: JSON.stringify({ query })
 		});
 
 		const data = response?.data;
 
-		const emotes: SevenTVEmoteMap = new Map();
+		const emotes: Emotes = new Map();
 
 		for (const item of data?.emoteSets?.emoteSet?.emotes?.items || []) {
 			emotes.set(item.alias, {
 				id: item.id,
 				name: item.alias,
-				aspectRatio: item.emote.aspectRatio
+				aspectRatio: item.emote.aspectRatio,
+				url: `https://cdn.7tv.app/emote/${item.id}/1x.webp`
 			});
 		}
 
@@ -64,7 +66,8 @@ class SevenTV extends BaseApi {
 			emotes.set(item.alias, {
 				id: item.id,
 				name: item.alias,
-				aspectRatio: item.emote.aspectRatio
+				aspectRatio: item.emote.aspectRatio,
+				url: `https://cdn.7tv.app/emote/${item.id}/1x.webp`
 			});
 		}
 

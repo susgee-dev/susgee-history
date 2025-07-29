@@ -1,11 +1,9 @@
 export type UserResponse = {
-	data: User[];
-};
-
-export type User = {
-	id: string;
-	login: string;
-	display_name: string;
+	data: {
+		id: string;
+		login: string;
+		display_name: string;
+	}[];
 };
 
 export type BadgeInfo = {
@@ -26,37 +24,23 @@ export type TwitchBadgeVersion = {
 	click_url: string | null;
 };
 
-export type TwitchBadgeSet = {
-	set_id: string;
-	versions: {
-		[versionId: string]: TwitchBadgeVersion;
-	};
-};
-
 export type TwitchBadgesResponse = {
-	data: TwitchBadgeSet[];
+	data: {
+		set_id: string;
+		versions: {
+			[versionId: string]: TwitchBadgeVersion;
+		};
+	}[];
 };
 
-export type TwitchEmoteImages = {
-	url_1x: string;
-	url_2x: string;
-	url_4x: string;
+export type TwitchIRCEmote = {
+	emoteId: string;
+	start: number;
+	end: number;
+	url: string;
 };
 
-export type TwitchEmote = {
-	id: string;
-	name: string;
-	images: TwitchEmoteImages;
-};
-
-export type TwitchEmotesResponse = {
-	data: TwitchEmote[];
-	template: string;
-};
-
-export type GlobalEmotesMap = {
-	[emoteName: string]: {
-		id: string;
-		url: string;
-	};
+export type TwitchBadge = {
+	content: string;
+	url: string;
 };

@@ -1,17 +1,16 @@
 import logger from '@/lib/logger';
 import { getBestName } from '@/lib/utils';
+import { TwitchBadge, TwitchIRCEmote } from '@/types/api/helix';
 import {
 	BaseMessage,
 	ClearChatMessage,
 	Cosmetics,
-	Emote,
 	MessageContext,
 	MessageTypes,
 	ParsedIRC,
 	ParsedMessage,
 	PrivateMessage,
 	ProcessedWord,
-	TwitchBadge,
 	UserNoticeMessage
 } from '@/types/message';
 
@@ -149,7 +148,7 @@ class Parser {
 			.filter((badge): badge is TwitchBadge => badge !== null);
 	}
 
-	private parseEmotes(emotesStr: string): Emote[] {
+	private parseEmotes(emotesStr: string): TwitchIRCEmote[] {
 		if (!emotesStr) return [];
 
 		return emotesStr.split('/').flatMap((emoteStr) => {

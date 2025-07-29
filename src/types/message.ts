@@ -1,26 +1,14 @@
-import { BadgeMap } from '@/types/api/helix';
+import { BadgeMap, TwitchBadge, TwitchIRCEmote } from '@/types/api/helix';
 import { Emotes } from '@/types/emotes';
-
-export type TwitchBadge = {
-	content: string;
-	url: string;
-};
 
 export type ProcessedWord =
 	| { type: 'text'; content: string }
 	| { type: 'emote'; content: string; id: string; url: string; aspectRatio: number }
 	| { type: 'link'; content: string; url: string };
 
-export type Emote = {
-	emoteId: string;
-	start: number;
-	end: number;
-	url: string;
-};
-
 export type Cosmetics = {
 	twitch: {
-		emotes?: Emote[];
+		emotes?: TwitchIRCEmote[];
 		badges: BadgeMap;
 	};
 	betterTtv: {
@@ -55,7 +43,7 @@ export interface BaseMessage {
 	bestName: string;
 	color?: string;
 	badges: TwitchBadge[];
-	emotes: Emote[];
+	emotes: TwitchIRCEmote[];
 	isFirstMessage: boolean;
 	text: ProcessedWord[];
 }

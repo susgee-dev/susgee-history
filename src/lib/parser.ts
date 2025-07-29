@@ -174,6 +174,7 @@ class Parser {
 		const twitchEmotes = cosmetics.twitch.emotes || [];
 		const stvEmotes = cosmetics.sevenTv.emotes;
 		const bttvEmotes = cosmetics.betterTtv.emotes;
+		const ffzEmotes = cosmetics.frankerFazeZ.emotes;
 
 		const words = message.split(' ');
 		let index = 0;
@@ -216,6 +217,19 @@ class Parser {
 					content: bttvEmote.name,
 					aspectRatio: bttvEmote.aspectRatio,
 					url: bttvEmote.url
+				});
+				continue;
+			}
+
+			const ffzEmote = ffzEmotes.get(word);
+
+			if (ffzEmote) {
+				processed.push({
+					type: 'emote',
+					id: ffzEmote.id,
+					content: ffzEmote.name,
+					aspectRatio: ffzEmote.aspectRatio,
+					url: ffzEmote.url
 				});
 				continue;
 			}

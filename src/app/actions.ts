@@ -2,6 +2,7 @@
 
 import sevenTV from '@/lib/api/7tv';
 import betterTTV from '@/lib/api/bttv';
+import frankerFazeZ from '@/lib/api/ffz';
 import helix from '@/lib/api/helix';
 import recentMessages from '@/lib/api/recentMessages';
 import parser from '@/lib/parser';
@@ -64,7 +65,9 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 			channelBadges,
 			stvEmotes,
 			bttvChannelEmotes,
-			bttvGlobalEmotes
+			bttvGlobalEmotes,
+			ffzChannelEmotes,
+			ffzGlobalEmotes
 		] = await Promise.all([
 			recentMessages.get({
 				channel: channel.toLowerCase(),
@@ -75,7 +78,9 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 			helix.getChannelBadges(channelId),
 			sevenTV.getEmotes(channelId),
 			betterTTV.getChannelEmotes(channelId),
-			betterTTV.getGlobalEmotes()
+			betterTTV.getGlobalEmotes(),
+			frankerFazeZ.getChannelEmotes(channelId),
+			frankerFazeZ.getGlobalEmotes()
 		]);
 
 		messages = fetchedMessages;
@@ -89,6 +94,9 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 			},
 			betterTtv: {
 				emotes: new Map([...Array.from(bttvGlobalEmotes), ...Array.from(bttvChannelEmotes)])
+			},
+			frankerFazeZ: {
+				emotes: new Map([...Array.from(ffzGlobalEmotes), ...Array.from(ffzChannelEmotes)])
 			},
 			sevenTv: {
 				emotes: stvEmotes
@@ -110,6 +118,9 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 				badges: globalBadges
 			},
 			betterTtv: {
+				emotes: new Map()
+			},
+			frankerFazeZ: {
 				emotes: new Map()
 			},
 			sevenTv: {

@@ -26,6 +26,9 @@ export type Cosmetics = {
 	betterTtv: {
 		emotes: Emotes;
 	};
+	frankerFazeZ: {
+		emotes: Emotes;
+	};
 	sevenTv: {
 		emotes: SevenTVEmoteMap;
 	};

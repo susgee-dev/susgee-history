@@ -1,4 +1,3 @@
-import { SevenTVEmoteMap } from '@/types/api/7tv';
 import { BadgeMap } from '@/types/api/helix';
 import { Emotes } from '@/types/emotes';
 
@@ -16,6 +15,7 @@ export type Emote = {
 	emoteId: string;
 	start: number;
 	end: number;
+	url: string;
 };
 
 export type Cosmetics = {
@@ -30,7 +30,7 @@ export type Cosmetics = {
 		emotes: Emotes;
 	};
 	sevenTv: {
-		emotes: SevenTVEmoteMap;
+		emotes: Emotes;
 	};
 };
 

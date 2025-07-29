@@ -1,7 +1,28 @@
-export type SevenTVEmote = {
+export type SevenTvEmote = {
 	id: string;
-	name: string;
-	aspectRatio: number;
+	alias: string;
+	emote: {
+		aspectRatio: number;
+	};
 };
 
-export type SevenTVEmoteMap = Map<string, SevenTVEmote>;
+export type SevenTvEmoteSet = {
+	emotes: {
+		items: SevenTvEmote[];
+	};
+};
+
+export type SevenTVResponse = {
+	data: {
+		emoteSets: {
+			emoteSet: SevenTvEmoteSet;
+		};
+		users: {
+			userByConnection: {
+				style: {
+					activeEmoteSet: SevenTvEmoteSet;
+				};
+			};
+		};
+	};
+};

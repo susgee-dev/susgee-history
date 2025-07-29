@@ -161,7 +161,8 @@ class Parser {
 				return {
 					emoteId,
 					start,
-					end
+					end,
+					url: `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/3.0`
 				};
 			});
 		});
@@ -190,7 +191,7 @@ class Parser {
 					id: twitchEmote.emoteId,
 					content: word,
 					aspectRatio: 1,
-					url: `https://static-cdn.jtvnw.net/emoticons/v2/${twitchEmote.emoteId}/default/dark/3.0`
+					url: twitchEmote.url
 				});
 				continue;
 			}
@@ -203,7 +204,7 @@ class Parser {
 					id: stvEmote.id,
 					content: stvEmote.name,
 					aspectRatio: stvEmote.aspectRatio,
-					url: `https://cdn.7tv.app/emote/${stvEmote.id}/1x.webp`
+					url: stvEmote.url
 				});
 				continue;
 			}

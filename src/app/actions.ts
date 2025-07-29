@@ -1,6 +1,7 @@
 'use server';
 
 import sevenTV from '@/lib/api/7tv';
+import betterTTV from '@/lib/api/bttv';
 import helix from '@/lib/api/helix';
 import recentMessages from '@/lib/api/recentMessages';
 import parser from '@/lib/parser';
@@ -57,7 +58,14 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 			throw new Error('Channel not found');
 		}
 
-		const [fetchedMessages, globalBadges, channelBadges, stvEmotes] = await Promise.all([
+		const [
+			fetchedMessages,
+			globalBadges,
+			channelBadges,
+			stvEmotes,
+			bttvChannelEmotes,
+			bttvGlobalEmotes
+		] = await Promise.all([
 			recentMessages.get({
 				channel: channel.toLowerCase(),
 				provider: options.provider,
@@ -65,7 +73,9 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 			}),
 			helix.getGlobalBadges(),
 			helix.getChannelBadges(channelId),
-			sevenTV.getEmotes(channelId)
+			sevenTV.getEmotes(channelId),
+			betterTTV.getChannelEmotes(channelId),
+			betterTTV.getGlobalEmotes()
 		]);
 
 		messages = fetchedMessages;
@@ -76,6 +86,9 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 					...Array.from(globalBadges.entries()),
 					...Array.from(channelBadges.entries())
 				])
+			},
+			betterTtv: {
+				emotes: new Map([...Array.from(bttvGlobalEmotes), ...Array.from(bttvChannelEmotes)])
 			},
 			sevenTv: {
 				emotes: stvEmotes
@@ -95,6 +108,9 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 		cosmetics = {
 			twitch: {
 				badges: globalBadges
+			},
+			betterTtv: {
+				emotes: new Map()
 			},
 			sevenTv: {
 				emotes: new Map()

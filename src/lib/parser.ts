@@ -173,6 +173,7 @@ class Parser {
 		const processed: ProcessedWord[] = [];
 		const twitchEmotes = cosmetics.twitch.emotes || [];
 		const stvEmotes = cosmetics.sevenTv.emotes;
+		const bttvEmotes = cosmetics.betterTtv.emotes;
 
 		const words = message.split(' ');
 		let index = 0;
@@ -202,6 +203,19 @@ class Parser {
 					content: stvEmote.name,
 					aspectRatio: stvEmote.aspectRatio,
 					url: `https://cdn.7tv.app/emote/${stvEmote.id}/1x.webp`
+				});
+				continue;
+			}
+
+			const bttvEmote = bttvEmotes.get(word);
+
+			if (bttvEmote) {
+				processed.push({
+					type: 'emote',
+					id: bttvEmote.id,
+					content: bttvEmote.name,
+					aspectRatio: bttvEmote.aspectRatio,
+					url: bttvEmote.url
 				});
 				continue;
 			}

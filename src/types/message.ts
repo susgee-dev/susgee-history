@@ -1,5 +1,6 @@
 import { SevenTVEmoteMap } from '@/types/api/7tv';
 import { BadgeMap } from '@/types/api/helix';
+import { Emotes } from '@/types/emotes';
 
 export type TwitchBadge = {
 	content: string;
@@ -21,6 +22,9 @@ export type Cosmetics = {
 	twitch: {
 		emotes?: Emote[];
 		badges: BadgeMap;
+	};
+	betterTtv: {
+		emotes: Emotes;
 	};
 	sevenTv: {
 		emotes: SevenTVEmoteMap;

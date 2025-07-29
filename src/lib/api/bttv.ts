@@ -14,8 +14,9 @@ class BetterTTV extends BaseApi {
 		const response = await super.fetch<ChannelResponse>(`users/twitch/${channelId}`);
 
 		const result: Emotes = new Map();
+		const allEmotes = [...(response?.sharedEmotes || []), ...(response?.channelEmotes || [])];
 
-		for (const emote of response?.channelEmotes || []) {
+		for (const emote of allEmotes) {
 			result.set(emote.code, {
 				id: emote.id,
 				name: emote.code,

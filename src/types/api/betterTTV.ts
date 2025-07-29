@@ -5,6 +5,7 @@ export type BetterTTVEmote = {
 
 export type ChannelResponse = {
 	channelEmotes: BetterTTVEmote[];
+	sharedEmotes: BetterTTVEmote[];
 };
 
 export type GlobalEmotesResponse = BetterTTVEmote[];

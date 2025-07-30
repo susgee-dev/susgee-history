@@ -176,10 +176,19 @@ class Parser {
 		const bttvEmotes = cosmetics.betterTtv.emotes;
 		const ffzEmotes = cosmetics.frankerFazeZ.emotes;
 
-		const words = message.split(' ');
 		let index = 0;
 
-		for (const word of words) {
+		const wordRegex = /(\p{Emoji}|\bhttps?:\/\/\S+\b|\w+|\s+|[^\w\s])/gu;
+		const parts = [...message.matchAll(wordRegex)].map((m) => m[0]);
+
+		for (const word of parts) {
+			const clean = word.trim();
+
+			if (!clean) {
+				index += word.length;
+				continue;
+			}
+
 			const twitchEmote = twitchEmotes.find((e) => e.start === index);
 
 			index += Array.from(word).length + 1;
@@ -239,7 +248,13 @@ class Parser {
 				continue;
 			}
 
-			processed.push({ type: 'text', content: word });
+			if (/\p{Emoji}/u.test(word)) {
+				processed.push({ type: 'emoji', content: word });
+			} else {
+				processed.push({ type: 'text', content: word });
+			}
+
+			index += word.length;
 		}
 
 		return processed;

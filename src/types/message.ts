@@ -46,6 +46,7 @@ export interface BaseMessage {
 	emotes: TwitchIRCEmote[];
 	isFirstMessage: boolean;
 	text: ProcessedWord[];
+	rawIRC?: Array<{key: string, value: string}>;
 }
 
 export interface PrivateMessage extends BaseMessage {

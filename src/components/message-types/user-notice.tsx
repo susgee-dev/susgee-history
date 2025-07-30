@@ -15,7 +15,7 @@ export default function UserNotice({ message }: UserNoticeProps) {
 				<div className="relative top-0.5 text-sm text-muted-foreground">{message.context.text}</div>
 			)}
 
-			<Timestamp timestamp={message.timestamp} />
+			<Timestamp rawIRC={message.rawIRC} timestamp={message.timestamp} />
 
 			<span className="font-semibold" style={{ color: message.color }}>
 				{message.bestName}{' '}

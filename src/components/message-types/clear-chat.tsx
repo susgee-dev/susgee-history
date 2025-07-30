@@ -11,7 +11,7 @@ type ClearChatProps = {
 export default function ClearChat({ message }: ClearChatProps) {
 	return (
 		<div className={'w-full break-words bg-red-500/20 px-1 py-1 text-lg/6'}>
-			<Timestamp timestamp={message.timestamp} />
+			<Timestamp rawIRC={message.rawIRC} timestamp={message.timestamp} />
 			<MessageText message={message} />
 		</div>
 	);

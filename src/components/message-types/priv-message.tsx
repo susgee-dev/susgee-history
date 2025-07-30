@@ -78,7 +78,7 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 				</div>
 			)}
 
-			<Timestamp timestamp={message.timestamp} />
+			<Timestamp rawIRC={message.rawIRC} timestamp={message.timestamp} />
 
 			<Badges message={message} />
 

@@ -84,12 +84,67 @@ class Parser {
 		return { cmd, tags, prefix, rest };
 	}
 
+	private createIrcData(
+		prefix: string,
+		command: string,
+		args: string[],
+		tagsRecord: Record<string, string>
+	): Array<{ key: string; value: string }> {
+		const ircData: Array<{ key: string; value: string }> = [];
+
+		const username = prefix ? prefix.split('!')[0] : '';
+
+		ircData.push({ key: 'source', value: prefix });
+		ircData.push({ key: 'command', value: command });
+		ircData.push({ key: 'username', value: username });
+
+		if (args.length > 0) {
+			ircData.push({ key: 'channel', value: args[0] });
+			if (args.length > 1) {
+				ircData.push({ key: 'message', value: args[1] });
+			}
+		}
+
+		const sortedTags = Object.entries(tagsRecord).sort(([a], [b]) => a.localeCompare(b));
+
+		for (const [key, value] of sortedTags) {
+			ircData.push({ key, value });
+		}
+
+		return ircData;
+	}
+
 	private createBaseMessage(
 		tags: Map<string, string>,
 		login: string,
 		displayName: string,
-		cosmetics: Cosmetics
+		cosmetics: Cosmetics,
+		parsed?: Omit<ParsedIRC, 'cosmetics'>
 	): BaseMessage {
+		const tagsRecord: Record<string, string> = {};
+
+		if (parsed?.tags) {
+			for (const [key, value] of parsed.tags.entries()) {
+				tagsRecord[key] = value;
+			}
+		}
+
+		const args: string[] = [];
+
+		if (parsed?.rest) {
+			const channelMatch = parsed.rest.match(/(#\S+)/);
+
+			if (channelMatch) {
+				args.push(channelMatch[1]);
+			}
+
+			const messageMatch = parsed.rest.match(/#\S+\s+:(.+)$/);
+
+			if (messageMatch) {
+				args.push(messageMatch[1]);
+			}
+		}
+
 		return {
 			id: tags.get('id') || '',
 			text: [],
@@ -100,7 +155,8 @@ class Parser {
 			color: tags.get('color') || this.fallbackColor,
 			badges: this.parseBadges(tags.get('badges') || '', tags.get('badge-info') || '', cosmetics),
 			emotes: this.parseEmotes(tags.get('emotes') || ''),
-			isFirstMessage: tags.get('first-msg') === '1'
+			isFirstMessage: tags.get('first-msg') === '1',
+			rawIRC: parsed ? this.createIrcData(parsed.prefix, parsed.cmd, args, tagsRecord) : undefined
 		};
 	}
 
@@ -245,7 +301,7 @@ class Parser {
 		return processed;
 	}
 
-	private handlePrivMsg({ tags, prefix, rest, cosmetics }: ParsedIRC): PrivateMessage | null {
+	private handlePrivMsg({ tags, prefix, rest, cosmetics, cmd }: ParsedIRC): PrivateMessage | null {
 		const loginMatch = prefix.match(/!([a-z0-9_]{1,25})@/);
 
 		if (!loginMatch) return null;
@@ -279,7 +335,12 @@ class Parser {
 			};
 		}
 
-		const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics);
+		const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics, {
+			tags,
+			prefix,
+			rest,
+			cmd
+		});
 
 		cosmetics.twitch.emotes = baseMessage.emotes;
 		const processedMessage = this.processText(messageContent, cosmetics);
@@ -297,7 +358,13 @@ class Parser {
 		};
 	}
 
-	private handleUserNotice({ tags, rest, cosmetics, prefix }: ParsedIRC): UserNoticeMessage | null {
+	private handleUserNotice({
+		tags,
+		rest,
+		cosmetics,
+		prefix,
+		cmd
+	}: ParsedIRC): UserNoticeMessage | null {
 		const login = tags.get('login') || prefix.match(/!([^@]+)@/)?.[1] || null;
 
 		if (!login) return null;
@@ -305,7 +372,12 @@ class Parser {
 		const displayName = tags.get('display-name') || login;
 		const messageContent = rest.match(/#[^ ]+ ?:?(.*)$/)?.[1].trim() || '';
 
-		const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics);
+		const baseMessage = this.createBaseMessage(tags, login, displayName, cosmetics, {
+			tags,
+			prefix,
+			rest,
+			cmd
+		});
 
 		cosmetics.twitch.emotes = baseMessage.emotes;
 		const text = messageContent ? this.processText(messageContent, cosmetics) : [];
@@ -341,7 +413,7 @@ class Parser {
 		return result;
 	}
 
-	private handleClearChat({ tags, rest }: ParsedIRC): ClearChatMessage | null {
+	private handleClearChat({ tags, rest, prefix, cmd }: ParsedIRC): ClearChatMessage | null {
 		const targetUserMatch = rest.match(/#[^ ]+ (.+)$/);
 
 		if (!targetUserMatch) return null;
@@ -356,6 +428,20 @@ class Parser {
 			? `${targetUser} has been timed out for ${banDuration} seconds`
 			: `${targetUser} has been banned`;
 
+		const tagsRecord: Record<string, string> = {};
+
+		for (const [key, value] of tags.entries()) {
+			tagsRecord[key] = value;
+		}
+
+		const args: string[] = [];
+
+		const channelMatch = rest.match(/(#\S+)/);
+
+		if (channelMatch) {
+			args.push(channelMatch[1]);
+		}
+
 		const baseMessage: BaseMessage = {
 			id: tags.get('rm-received-ts') || '',
 			timestamp: parseInt(tags.get('tmi-sent-ts') || '0', 10),
@@ -365,7 +451,8 @@ class Parser {
 			badges: [],
 			emotes: [],
 			isFirstMessage: false,
-			text: messageText.split(' ').map((word) => ({ type: 'text', content: word }))
+			text: messageText.split(' ').map((word) => ({ type: 'text', content: word })),
+			rawIRC: this.createIrcData(prefix, cmd, args, tagsRecord)
 		};
 
 		return {

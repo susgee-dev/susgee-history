@@ -1,11 +1,12 @@
 'use client';
 
 import Popup from '@/components/ui/popup';
+import { RawIRCData } from '@/types/message';
 
 type RawDataPopupProps = {
 	isOpen: boolean;
 	action: () => void;
-	data: { key: string; value: string }[];
+	data: RawIRCData[];
 };
 
 export default function RawDataPopup({ isOpen, action, data }: RawDataPopupProps) {

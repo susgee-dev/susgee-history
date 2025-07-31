@@ -35,6 +35,11 @@ export type MessageContext = {
 	id?: string;
 } | null;
 
+export type RawIRCData = {
+	key: string;
+	value: string;
+};
+
 export interface BaseMessage {
 	id: string;
 	timestamp: number;
@@ -46,7 +51,7 @@ export interface BaseMessage {
 	emotes: TwitchIRCEmote[];
 	isFirstMessage: boolean;
 	text: ProcessedWord[];
-	rawIRC?: Array<{key: string, value: string}>;
+	rawIRC?: RawIRCData[];
 }
 
 export interface PrivateMessage extends BaseMessage {

@@ -11,6 +11,7 @@ import {
 	ParsedMessage,
 	PrivateMessage,
 	ProcessedWord,
+	RawIRCData,
 	UserNoticeMessage
 } from '@/types/message';
 
@@ -89,8 +90,8 @@ class Parser {
 		command: string,
 		args: string[],
 		tagsRecord: Record<string, string>
-	): Array<{ key: string; value: string }> {
-		const ircData: Array<{ key: string; value: string }> = [];
+	): RawIRCData[] {
+		const ircData: RawIRCData[] = [];
 
 		const username = prefix ? prefix.split('!')[0] : '';
 

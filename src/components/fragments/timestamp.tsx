@@ -4,10 +4,11 @@ import { useState } from 'react';
 
 import RawDataPopup from '@/components/fragments/raw-data-popup';
 import { formatTime } from '@/lib/utils';
+import { RawIRCData } from '@/types/message';
 
 type TimestampProps = {
 	timestamp: number;
-	rawIRC?: { key: string; value: string }[];
+	rawIRC?: RawIRCData[];
 };
 
 export default function Timestamp({ timestamp, rawIRC }: TimestampProps) {

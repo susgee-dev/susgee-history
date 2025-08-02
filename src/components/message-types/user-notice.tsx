@@ -1,6 +1,7 @@
 'use client';
 
 import MessageText from '@/components/fragments/message-text';
+import RawData from '@/components/fragments/raw-data';
 import Timestamp from '@/components/fragments/timestamp';
 import { UserNoticeMessage } from '@/types/message';
 
@@ -15,7 +16,8 @@ export default function UserNotice({ message }: UserNoticeProps) {
 				<div className="relative top-0.5 text-sm text-muted-foreground">{message.context.text}</div>
 			)}
 
-			<Timestamp rawIRC={message.rawIRC} timestamp={message.timestamp} />
+			<RawData data={message.rawIRC} />
+			<Timestamp timestamp={message.timestamp} />
 
 			<span className="font-semibold" style={{ color: message.color }}>
 				{message.bestName}{' '}

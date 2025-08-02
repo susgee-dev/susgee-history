@@ -4,6 +4,7 @@ import { MouseEvent, useEffect, useState } from 'react';
 
 import Badges from '@/components/fragments/badges';
 import MessageText from '@/components/fragments/message-text';
+import RawData from '@/components/fragments/raw-data';
 import Timestamp from '@/components/fragments/timestamp';
 import { Link } from '@/components/ui/link';
 import { cn } from '@/lib/utils';
@@ -78,7 +79,8 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 				</div>
 			)}
 
-			<Timestamp rawIRC={message.rawIRC} timestamp={message.timestamp} />
+			<RawData data={message.rawIRC} />
+			<Timestamp timestamp={message.timestamp} />
 
 			<Badges message={message} />
 

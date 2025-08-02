@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
+import { cn } from '@/lib/utils';
 
 type PopupProps = {
 	isOpen: boolean;
@@ -46,7 +47,11 @@ export default function Popup({ isOpen, action, title, children, className = '' 
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 			<div
 				ref={popupRef}
-				className={`max-h-[80vh] w-[90vw] max-w-2xl overflow-auto rounded-lg bg-gradient-bg bg-fixed p-4 shadow-lg ${className}`}
+				className={cn(
+					'max-h-[80vh] w-[90vw] max-w-2xl overflow-auto rounded-lg p-4 shadow-lg',
+					'border border-primary-dark bg-gradient-bg bg-fixed',
+					className
+				)}
 			>
 				<div className="mb-4 flex items-center justify-between">
 					<Heading variant="compact">{title}</Heading>

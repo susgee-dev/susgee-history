@@ -29,7 +29,7 @@ export default function RawData({ data }: RawDataProps) {
 		<>
 			<Button
 				aria-label="View raw IRC data"
-				className="mr-1 size-3 text-sm text-primary"
+				className="mr-1 !size-3 text-sm text-primary"
 				size="icon"
 				title="View raw IRC data"
 				type="button"

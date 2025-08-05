@@ -244,6 +244,7 @@ class Parser {
 			if (twitchEmote) {
 				processed.push({
 					type: 'emote',
+					provider: 'twitch',
 					id: twitchEmote.emoteId,
 					content: word,
 					aspectRatio: 1,
@@ -257,6 +258,7 @@ class Parser {
 			if (stvEmote) {
 				processed.push({
 					type: 'emote',
+					provider: '7tv',
 					id: stvEmote.id,
 					content: stvEmote.name,
 					aspectRatio: stvEmote.aspectRatio,
@@ -270,6 +272,7 @@ class Parser {
 			if (bttvEmote) {
 				processed.push({
 					type: 'emote',
+					provider: 'bttv',
 					id: bttvEmote.id,
 					content: bttvEmote.name,
 					aspectRatio: bttvEmote.aspectRatio,
@@ -283,6 +286,7 @@ class Parser {
 			if (ffzEmote) {
 				processed.push({
 					type: 'emote',
+					provider: 'ffz',
 					id: ffzEmote.id,
 					content: ffzEmote.name,
 					aspectRatio: ffzEmote.aspectRatio,

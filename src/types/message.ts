@@ -3,8 +3,15 @@ import { Emotes } from '@/types/emotes';
 
 export type ProcessedWord =
 	| { type: 'text'; content: string }
-	| { type: 'emote'; content: string; id: string; url: string; aspectRatio: number }
-	| { type: 'link'; content: string; url: string };
+	| { type: 'link'; content: string; url: string }
+	| {
+			type: 'emote';
+			content: string;
+			provider: string;
+			id: string;
+			url: string;
+			aspectRatio: number;
+	  };
 
 export type Cosmetics = {
 	twitch: {

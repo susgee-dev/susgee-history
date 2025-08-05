@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			lang="en"
 		>
 			<body className="flex min-h-screen flex-col bg-gradient-bg bg-fixed text-font">
-				<main className="mx-auto w-full max-w-[35rem] flex-1 p-4">{children}</main>
+				<main className="mx-auto w-full max-w-[45rem] flex-1 p-4">{children}</main>
 				<Footer />
 				{process.env.TRACKING_ID && (
 					<Script

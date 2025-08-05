@@ -27,6 +27,8 @@ export default function MessageText({ message, isAction = false }: MessageTextPr
 								<EmoteImage
 									alt={word.content}
 									aspectRatio={word.aspectRatio}
+									id={word.id}
+									provider={word.provider}
 									src={word.url}
 									title={word.content}
 								/>{' '}

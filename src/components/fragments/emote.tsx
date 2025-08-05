@@ -1,16 +1,19 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
+import { Link } from '@/components/ui/link';
 import { cn } from '@/lib/utils';
 
 type Emote = {
+	id: string;
+	provider: string;
 	src: string;
 	alt: string;
 	title: string;
 	aspectRatio: number;
 };
 
-export default function EmoteImage({ src, alt, title, aspectRatio }: Emote) {
+export default function EmoteImage({ id, provider, src, alt, title, aspectRatio }: Emote) {
 	const [hasError, setHasError] = useState(false);
 
 	const height = 24;
@@ -30,18 +33,20 @@ export default function EmoteImage({ src, alt, title, aspectRatio }: Emote) {
 	}
 
 	return (
-		<Image
-			unoptimized
-			alt={alt}
-			className="mx-0.5 inline-block align-sub"
-			height={height}
-			loading="lazy"
-			src={src}
-			title={title}
-			width={width}
-			onError={() => {
-				setHasError(true);
-			}}
-		/>
+		<Link href={`https://chatvau.lt/emote/${provider}/${id}`} target="_blank">
+			<Image
+				unoptimized
+				alt={alt}
+				className="mx-0.5 inline-block align-sub"
+				height={height}
+				loading="lazy"
+				src={src}
+				title={title}
+				width={width}
+				onError={() => {
+					setHasError(true);
+				}}
+			/>
+		</Link>
 	);
 }

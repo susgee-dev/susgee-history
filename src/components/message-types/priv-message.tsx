@@ -22,6 +22,12 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 			if (window.location.hash === `#${message.id}`) {
 				setIsHighlighted(true);
 
+				const messageElement = document.getElementById(message.id);
+
+				if (messageElement) {
+					messageElement.scrollIntoView({ behavior: 'smooth' });
+				}
+
 				const timer = setTimeout(() => {
 					setIsHighlighted(false);
 				}, 2000);
@@ -31,7 +37,6 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 		};
 
 		checkHash();
-
 		window.addEventListener('hashchange', checkHash);
 
 		return () => {

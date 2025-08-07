@@ -58,7 +58,7 @@ class SevenTV extends BaseApi {
 				id: item.id,
 				name: item.alias,
 				aspectRatio: item.emote.aspectRatio,
-				url: `https://cdn.7tv.app/emote/${item.id}/1x.webp`
+				url: `https://cdn.7tv.app/emote/${item.id}/2x.webp`
 			});
 		}
 
@@ -67,7 +67,7 @@ class SevenTV extends BaseApi {
 				id: item.id,
 				name: item.alias,
 				aspectRatio: item.emote.aspectRatio,
-				url: `https://cdn.7tv.app/emote/${item.id}/1x.webp`
+				url: `https://cdn.7tv.app/emote/${item.id}/2x.webp`
 			});
 		}
 

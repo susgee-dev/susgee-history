@@ -77,8 +77,10 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 					{message.context.type === 'system' && message.context.text}
 					{message.context.type === 'reply' && (
 						<Link href={`#${message.context.id}`} unstyled={true} onClick={handleReplyClick}>
-							Replying to <span className="font-medium">@{message.context.username}</span>:{' '}
-							{message.context.text}
+							<span>
+								Replying to <span className="font-medium">@{message.context.username}</span>:{' '}
+								{message.context.text}
+							</span>
 						</Link>
 					)}
 				</div>

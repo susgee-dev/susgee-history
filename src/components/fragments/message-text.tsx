@@ -16,7 +16,7 @@ export default function MessageText({ message, isAction = false }: MessageTextPr
 		<span
 			className="break-word"
 			style={{
-				color: isAction ? message.color : undefined
+				color: isAction ? `hsl(from ${message.color} h s 60%)` : undefined
 			}}
 		>
 			{message.text.map((word, index) => {

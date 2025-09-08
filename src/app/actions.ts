@@ -135,7 +135,7 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 			?.filter((msg): msg is ParsedMessage => !!msg) || [];
 
 	const shouldReverse =
-		options.reverse === undefined ? provider.defaultReverseOrder : options.reverse;
+		options.reverse === undefined ? provider.defaultReverseOrder : !options.reverse;
 
 	if (shouldReverse) {
 		processedMessages = processedMessages.reverse();

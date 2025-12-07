@@ -33,11 +33,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<Footer />
 				{process.env.TRACKING_ID && (
 					<Script
-						defer
-						data-website-id={process.env.TRACKING_ID}
-						src="https://umami.susgee.dev/script.js"
-						strategy="afterInteractive"
-					/>
+					defer
+					data-site-id={process.env.TRACKING_ID}
+					src="https://track.susgee.dev/api/script.js"
+					strategy="afterInteractive"
+				/>
 				)}
 			</body>
 		</html>

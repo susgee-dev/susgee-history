@@ -15,7 +15,7 @@ export type SevenTvEmoteSet = {
 export type SevenTVResponse = {
 	data: {
 		emoteSets: {
-			emoteSet: SevenTvEmoteSet;
+			global: SevenTvEmoteSet;
 		};
 		users: {
 			userByConnection: {

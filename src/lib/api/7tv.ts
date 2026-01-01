@@ -4,8 +4,6 @@ import { SevenTVResponse } from '@/types/api/7tv';
 import { Emotes } from '@/types/emotes';
 
 class SevenTV extends BaseApi {
-	private globalEmoteSetId: string = '01HKQT8EWR000ESSWF3625XCS4';
-
 	constructor() {
 		super('https://7tv.io/v4/gql');
 	}
@@ -13,7 +11,7 @@ class SevenTV extends BaseApi {
 	async getEmotes(twitchId: string): Promise<Emotes> {
 		const query = `{
 			emoteSets {
-				emoteSet (id: "${this.globalEmoteSetId}") {
+				global {
 					emotes {
 						items {
 							id
@@ -53,7 +51,7 @@ class SevenTV extends BaseApi {
 
 		const emotes: Emotes = new Map();
 
-		for (const item of data?.emoteSets?.emoteSet?.emotes?.items || []) {
+		for (const item of data?.emoteSets?.global?.emotes?.items || []) {
 			emotes.set(item.alias, {
 				id: item.id,
 				name: item.alias,

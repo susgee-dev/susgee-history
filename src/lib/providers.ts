@@ -8,6 +8,7 @@ class Providers {
 	readonly providers = {
 		ROBOTTY: 'https://recent-messages.robotty.de/api/v2/recent-messages/',
 		ZNEIX: 'https://recent-messages.zneix.eu/api/v2/recent-messages/',
+		LILB: 'https://rm.lilb.dev/api/v2/recent-messages/',
 		ZONIAN: 'https://logs.zonian.dev/rm/',
 		CUSTOM: 'custom recent-messages api',
 		DIRECT_LOGS: 'direct logs url'
@@ -33,6 +34,11 @@ class Providers {
 				label: 'Zneix',
 				value: this.providers.ZNEIX,
 				description: 'recent-messages.zneix.eu'
+			},
+			{
+				label: 'lilb',
+				value: this.providers.LILB,
+				description: 'rm.lilb.dev'
 			},
 			{
 				label: 'Zonian',

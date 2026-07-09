@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { type MouseEvent, useEffect, useState } from 'react';
 
 import { fetchLogsData } from '@/app/actions';
 import MessageList from '@/components/message-list';
@@ -17,12 +17,25 @@ type LogsContentProps = {
 	provider?: string | null;
 	limit?: number | null;
 	reverse?: boolean;
+	onBackToSearch: () => void;
 };
 
-export default function LogsContent({ channel, url, provider, limit, reverse }: LogsContentProps) {
+export default function LogsContent({
+	channel,
+	url,
+	provider,
+	limit,
+	reverse,
+	onBackToSearch
+}: LogsContentProps) {
 	const [parsed, setParsed] = useState<ParsedMessage[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+
+	const handleBackToSearch = (event: MouseEvent<HTMLAnchorElement>) => {
+		event.preventDefault();
+		onBackToSearch();
+	};
 
 	useEffect(() => {
 		async function loadLogsData() {
@@ -57,7 +70,9 @@ export default function LogsContent({ channel, url, provider, limit, reverse }: 
 
 	return (
 		<>
-			<Link href="/">← back to search</Link>
+			<Link href="/" onClick={handleBackToSearch}>
+				← back to search
+			</Link>
 
 			<div className="flex flex-wrap items-end justify-between">
 				<Heading as="h1" className="gradient-text flex w-fit flex-col" variant="compact">

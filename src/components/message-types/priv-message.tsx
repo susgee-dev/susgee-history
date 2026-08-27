@@ -66,14 +66,14 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 	return (
 		<div
 			className={cn(
-				'w-full break-words px-1 text-lg/6',
-				message.isFirstMessage ? 'bg-green-500/20' : '',
+				'w-full break-words rounded-chip px-2 py-1 text-lg/6 hover:bg-accent',
+				message.isFirstMessage ? 'bg-success/20' : '',
 				isHighlighted ? 'animate-highlight' : ''
 			)}
 			id={message.id}
 		>
 			{message.context && (
-				<div className="relative top-0.5 text-sm text-muted-foreground">
+				<div className="relative top-0.5 text-sm text-ink-muted">
 					{message.context.type === 'system' && message.context.text}
 					{message.context.type === 'reply' && (
 						<Link href={`#${message.context.id}`} unstyled={true} onClick={handleReplyClick}>

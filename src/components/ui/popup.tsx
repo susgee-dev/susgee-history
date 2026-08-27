@@ -44,12 +44,12 @@ export default function Popup({ isOpen, action, title, children, className = '' 
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+		<div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-canvas/80">
 			<div
 				ref={popupRef}
 				className={cn(
-					'max-h-[80vh] w-[90vw] max-w-2xl overflow-auto rounded-lg p-4 shadow-lg',
-					'border border-primary-dark bg-gradient-bg bg-fixed',
+					'max-h-[80vh] w-[90vw] max-w-2xl overflow-auto rounded-panel p-4 shadow-lg',
+					'border border-line bg-surface-panel',
 					className
 				)}
 			>

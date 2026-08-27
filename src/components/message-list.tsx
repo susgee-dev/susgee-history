@@ -20,15 +20,14 @@ type MessageListProps = {
 
 export default function MessageList({ messages }: MessageListProps) {
 	if (!messages.length) {
-		return <div className="py-4 text-center">No messages to display</div>;
+		return <div className="py-4 text-center text-ink-muted">No messages to display</div>;
 	}
 
 	return (
-		<div className="flex flex-col gap-1">
+		<div className="flex flex-col leading-relaxed">
 			{messages.map((msg, index) => {
 				const currentDate = new Date(msg.timestamp).toDateString();
 				const prevDate = index > 0 ? new Date(messages[index - 1].timestamp).toDateString() : null;
-
 				const dayChanged = index === 0 || currentDate !== prevDate;
 
 				return (

@@ -11,9 +11,9 @@ type UserNoticeProps = {
 
 export default function UserNotice({ message }: UserNoticeProps) {
 	return (
-		<div className={'w-full break-words bg-purple-500/20 px-1 py-1 text-lg/6'}>
+		<div className="w-full break-words rounded-chip bg-primary/20 px-2 py-1 text-lg/6">
 			{message.context && (
-				<div className="relative top-0.5 text-sm text-muted-foreground">{message.context.text}</div>
+				<div className="relative top-0.5 text-sm text-ink-muted">{message.context.text}</div>
 			)}
 
 			<RawData data={message.rawIRC} />

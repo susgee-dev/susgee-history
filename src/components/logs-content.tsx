@@ -38,7 +38,12 @@ export default function LogsContent({
 	};
 
 	useEffect(() => {
+		let cancelled = false;
+
 		async function loadLogsData() {
+			setError(null);
+			setIsLoading(true);
+
 			try {
 				const options = {
 					...(channel && { channel }),
@@ -50,16 +55,26 @@ export default function LogsContent({
 
 				const messages = await fetchLogsData(options);
 
-				setParsed(messages);
+				if (!cancelled) {
+					setParsed(messages);
+				}
 			} catch (err) {
-				setError('An error occurred while loading logs');
-				logger.error(err);
+				if (!cancelled) {
+					setError('An error occurred while loading logs');
+					logger.error(err);
+				}
 			} finally {
-				setIsLoading(false);
+				if (!cancelled) {
+					setIsLoading(false);
+				}
 			}
 		}
 
 		loadLogsData();
+
+		return () => {
+			cancelled = true;
+		};
 	}, [channel, url, provider, limit, reverse]);
 
 	if (error) {

@@ -1,6 +1,6 @@
-import type { Transition, Variants } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 
-const easeOut: Transition['ease'] = 'easeOut';
+const easeOut = 'easeOut' as const;
 
 export const motionDuration = 0.4;
 export const motionDurationOut = 0.2;

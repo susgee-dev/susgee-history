@@ -53,7 +53,7 @@ export default function EmoteImage({ id, provider, src, alt, title, aspectRatio 
 		return (
 			<span
 				className={cn(
-					'inline-block items-center justify-center rounded bg-gray-300 text-xs text-gray-600',
+					'inline-block items-center justify-center rounded-chip bg-surface-raised text-xs text-ink-muted',
 					`w-[${width}px] h-[${height}px]`
 				)}
 			>
@@ -91,7 +91,7 @@ export default function EmoteImage({ id, provider, src, alt, title, aspectRatio 
 			{showTooltip && (
 				<div
 					ref={tooltipRef}
-					className="absolute z-50 mt-1 rounded-md border border-primary-dark bg-gradient-bg p-3 shadow-lg"
+					className="absolute z-50 mt-1 rounded-control border border-line bg-surface-raised p-3 shadow-lg"
 					style={{
 						top: '100%',
 						left: '50%',
@@ -109,7 +109,7 @@ export default function EmoteImage({ id, provider, src, alt, title, aspectRatio 
 							src={src}
 							width={tooltipWidth}
 						/>
-						<span className="text-center font-medium text-font">{title}</span>
+						<span className="text-center font-medium text-ink">{title}</span>
 						<Link
 							className="text-sm"
 							href={`https://chatvau.lt/emote/${provider}/${id}`}

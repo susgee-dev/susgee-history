@@ -5,26 +5,28 @@ import { cn } from '@/lib/utils';
 
 const buttonVariants = {
 	variant: {
-		default: 'bg-primary-dark text-white shadow-xs hover:bg-primary-dark/90',
-		twitch: 'bg-twitch text-white hover:bg-twitch-dark',
-		destructive:
-			'bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
-		outline:
-			'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
-		secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
-		ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
+		default: 'bg-primary-dark hover:bg-primary text-white',
+		gradient:
+			'bg-gradient-text text-white hover:drop-shadow-[0_0_4px_rgba(255,255,255,0.2)] hover:brightness-110',
+		twitch: 'bg-twitch hover:bg-twitch-dark text-white',
+		secondary: 'bg-surface-raised border-line text-ink hover:bg-accent border',
+		outline: 'border-line-strong text-ink hover:bg-accent hover:text-ink-bright border',
+		ghost: 'text-ink hover:bg-accent hover:text-ink-bright',
+		danger:
+			'border-danger-border bg-danger-surface text-danger hover:bg-danger border hover:text-white',
+		destructive: 'bg-destructive text-destructive-foreground hover:brightness-110',
 		link: 'text-primary underline-offset-4 hover:underline'
 	},
 	size: {
-		default: 'h-9 px-4 py-2 has-[>svg]:px-3 text-md',
-		sm: 'rounded-md gap-1.5 px-3 py-1 has-[>svg]:px-2.5 text-sm',
-		lg: 'rounded-md px-6 py-3 has-[>svg]:px-4 text-lg',
+		default: 'h-9 px-4 py-2 has-[>svg]:px-3',
+		sm: 'gap-1.5 px-3 py-1 has-[>svg]:px-2.5 text-sm',
+		lg: 'h-12 px-6 py-3 has-[>svg]:px-4 text-lg',
 		icon: 'size-9'
 	}
 };
 
 const baseButtonClasses =
-	'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-all cursor-pointer disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive';
+	'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-control font-medium transition-all cursor-pointer disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas aria-invalid:border-destructive';
 
 type ButtonVariant = keyof typeof buttonVariants.variant;
 type ButtonSize = keyof typeof buttonVariants.size;

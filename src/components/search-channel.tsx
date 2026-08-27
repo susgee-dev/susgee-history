@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 
 import { Checkbox } from '@/components/ui/checkbox';
+import { fadeIn, popIn } from '@/lib/motion';
 import provider from '@/lib/providers';
 import { cn } from '@/lib/utils';
 
@@ -106,24 +107,21 @@ export default function SearchChannel() {
 		<div className="flex w-full flex-col gap-4">
 			<form className="flex w-full items-center space-x-2" onSubmit={handleSubmit}>
 				<motion.div
-					animate={{ opacity: 1, scale: 1 }}
+					animate="animate"
 					className="relative w-full"
-					initial={{ opacity: 0, scale: 0.95 }}
-					transition={{
-						duration: 0.3,
-						ease: 'easeInOut'
-					}}
+					initial="initial"
+					variants={popIn}
 				>
 					<input
 						autoComplete="off"
 						className={cn(
-							'w-full rounded-lg border border-primary/30 bg-transparent px-4 py-2',
-							'text-font placeholder-font/50 transition-all duration-300',
-							'focus:outline-none focus:ring-2 focus:ring-primary/60',
+							'w-full rounded-control border border-line bg-surface-raised px-4 py-2',
+							'text-ink transition-all placeholder:text-ink-muted',
+							'focus:border-primary-60 focus:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas',
 							showAdvanced &&
 								selectedProvider === provider.providers.DIRECT_LOGS &&
 								customProvider.trim()
-								? 'border-primary/10'
+								? 'border-line-soft'
 								: ''
 						)}
 						maxLength={25}
@@ -142,10 +140,10 @@ export default function SearchChannel() {
 					/>
 				</motion.div>
 				<motion.button
-					animate={{ opacity: 1, scale: 1 }}
+					animate="animate"
 					className={cn(
-						'rounded-lg bg-primary-dark px-4 py-2 text-font',
-						'transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/60',
+						'rounded-control bg-primary-dark px-4 py-2 text-white hover:bg-primary',
+						'transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas',
 						'disabled:pointer-events-none disabled:!opacity-50'
 					)}
 					disabled={
@@ -156,22 +154,20 @@ export default function SearchChannel() {
 								customProvider.trim())
 						)
 					}
-					initial={{ opacity: 0, scale: 0.95 }}
-					transition={{
-						duration: 0.3,
-						ease: 'easeInOut'
-					}}
+					initial="initial"
 					type="submit"
+					variants={popIn}
 				>
 					Go
 				</motion.button>
 			</form>
 
 			<motion.button
-				animate={{ opacity: 1 }}
-				className={cn('text-sm text-primary/70 transition-colors duration-200 hover:text-primary')}
-				initial={{ opacity: 0 }}
-				transition={{ duration: 0.2 }}
+				animate="animate"
+				className={cn('text-sm text-ink-muted transition-colors hover:text-primary')}
+				initial="initial"
+				type="button"
+				variants={fadeIn}
 				onClick={() => setShowAdvanced(!showAdvanced)}
 			>
 				{showAdvanced ? 'Hide' : 'Show'} Advanced Options
@@ -180,25 +176,22 @@ export default function SearchChannel() {
 			<AnimatePresence>
 				{showAdvanced && (
 					<motion.div
-						animate={{ opacity: 1, scale: 1 }}
-						className="flex origin-top flex-col gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4"
-						exit={{ opacity: 0, scale: 0.97 }}
-						initial={{ opacity: 0, scale: 0.97 }}
-						transition={{
-							duration: 0.2,
-							ease: 'easeInOut'
-						}}
+						animate="animate"
+						className="flex origin-top flex-col gap-3 rounded-panel border border-line bg-surface-panel p-4"
+						exit="exit"
+						initial="initial"
+						variants={popIn}
 					>
 						<div className="flex flex-col gap-2">
-							<label className="text-sm font-medium text-primary/80" htmlFor="provider-dropdown">
+							<label className="text-sm font-medium text-ink-muted" htmlFor="provider-dropdown">
 								Provider (optional):
 							</label>
 							<div ref={dropdownRef} className="relative">
 								<button
 									className={cn(
-										'flex w-full items-center justify-between rounded border border-primary/20',
-										'bg-transparent px-3 py-2 text-left text-sm text-font transition-all duration-300',
-										'focus:outline-none focus:ring-2 focus:ring-primary/60'
+										'flex w-full items-center justify-between rounded-control border border-line bg-surface-raised',
+										'px-3 py-2 text-left text-sm text-ink transition-all hover:bg-accent',
+										'focus:border-primary-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas'
 									)}
 									id="provider-dropdown"
 									type="button"
@@ -226,24 +219,24 @@ export default function SearchChannel() {
 								<AnimatePresence>
 									{showProviderDropdown && (
 										<motion.div
-											animate={{ opacity: 1, scale: 1 }}
-											className="absolute left-0 right-0 top-full z-10 mt-1 origin-top overflow-y-auto rounded-lg border border-primary/20 bg-primary-dark shadow-lg"
-											exit={{ opacity: 0, scale: 0.97 }}
-											initial={{ opacity: 0, scale: 0.97 }}
-											transition={{ duration: 0.2, ease: 'easeInOut' }}
+											animate="animate"
+											className="absolute left-0 right-0 top-full z-10 mt-1 origin-top overflow-y-auto rounded-control border border-line bg-surface-raised shadow-lg"
+											exit="exit"
+											initial="initial"
+											variants={popIn}
 										>
 											{provider.options.map((option) => (
 												<button
 													key={option.value}
 													className={cn(
-														'w-full px-3 py-2 text-left text-sm transition-colors duration-150 hover:bg-primary/20',
-														selectedProvider === option.value && 'bg-primary/30'
+														'w-full px-3 py-2 text-left text-sm transition-colors hover:bg-accent',
+														selectedProvider === option.value && 'bg-accent text-ink-bright'
 													)}
 													type="button"
 													onClick={() => handleProviderChange(option.value)}
 												>
 													<div className="font-medium">{option.label}</div>
-													<div className="text-xs text-primary/60">{option.description}</div>
+													<div className="text-xs text-ink-faint">{option.description}</div>
 												</button>
 											))}
 										</motion.div>
@@ -255,7 +248,7 @@ export default function SearchChannel() {
 						{(selectedProvider === provider.providers.CUSTOM ||
 							selectedProvider === provider.providers.DIRECT_LOGS) && (
 							<div className="flex flex-col gap-2">
-								<label className="text-sm font-medium text-primary/80" htmlFor="custom-provider">
+								<label className="text-sm font-medium text-ink-muted" htmlFor="custom-provider">
 									{selectedProvider === provider.providers.CUSTOM
 										? 'Custom Provider URL:'
 										: 'Direct Logs URL:'}
@@ -263,9 +256,9 @@ export default function SearchChannel() {
 								<input
 									required
 									className={cn(
-										'w-full rounded border border-primary/20 bg-transparent px-3 py-2 text-sm',
-										'text-font placeholder-font/50 transition-all duration-300',
-										'focus:outline-none focus:ring-2 focus:ring-primary/60'
+										'w-full rounded-control border border-line bg-surface-raised px-3 py-2 text-sm',
+										'text-ink transition-all placeholder:text-ink-muted',
+										'focus:border-primary-60 focus:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas'
 									)}
 									id="custom-provider"
 									placeholder={
@@ -277,7 +270,7 @@ export default function SearchChannel() {
 									value={customProvider}
 									onChange={(e) => setCustomProvider(e.target.value)}
 								/>
-								<p className="text-xs text-primary/60">
+								<p className="text-xs text-ink-faint">
 									{selectedProvider === provider.providers.CUSTOM
 										? 'Must be a valid recent-messages API endpoint'
 										: 'Enter a direct logs URL (will add ?raw if needed)'}
@@ -286,14 +279,14 @@ export default function SearchChannel() {
 						)}
 
 						<div className="flex flex-col gap-2">
-							<label className="text-sm font-medium text-primary/80" htmlFor="message-limit">
+							<label className="text-sm font-medium text-ink-muted" htmlFor="message-limit">
 								Message Limit (optional):
 							</label>
 							<input
 								className={cn(
-									'w-full rounded border border-primary/20 bg-transparent px-3 py-2 text-sm',
-									'text-font placeholder-font/50 transition-all duration-300',
-									'focus:outline-none focus:ring-2 focus:ring-primary/60'
+									'w-full rounded-control border border-line bg-surface-raised px-3 py-2 text-sm',
+									'text-ink transition-all placeholder:text-ink-muted',
+									'focus:border-primary-60 focus:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface-canvas'
 								)}
 								id="message-limit"
 								min="1"

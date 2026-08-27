@@ -49,10 +49,10 @@ export default function RootClient() {
 		<LogsContent
 			channel={channel}
 			limit={limit}
-			onBackToSearch={handleBackToSearch}
 			provider={provider}
 			reverse={reverse}
 			url={url}
+			onBackToSearch={handleBackToSearch}
 		/>
 	);
 }

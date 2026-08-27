@@ -7,5 +7,5 @@ type TimestampProps = {
 };
 
 export default function Timestamp({ timestamp }: TimestampProps) {
-	return <span className="font-mono text-sm text-muted-foreground">{formatTime(timestamp)} </span>;
+	return <span className="data text-sm text-ink-muted">{formatTime(timestamp)} </span>;
 }

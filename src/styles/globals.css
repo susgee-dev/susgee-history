@@ -2,16 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	--ink-bright: #f2eff7;
+	--ink: #cfcfcf;
+	--ink-muted: #9a949f;
+	--ink-faint: #6f6a75;
+	--surface-canvas: #0b0714;
+	--surface-overlay: #0d0916;
+	--surface-inset: #130f1d;
+	--surface-panel: #1a1426;
+	--surface-raised: #241d33;
+	--line: #2d2540;
+	--line-soft: #221b30;
+	--line-strong: #3d3453;
+	--primary: #b87fed;
+	--primary-60: #78549d;
+	--primary-30: #493462;
+	--primary-dark: #601e9e;
+	--twitch: #6441a5;
+	--twitch-dark: #5a3a94;
+	--danger: #e0555b;
+	--danger-surface: #3a1f26;
+	--danger-border: #6b2f38;
+	--destructive: #c73a44;
+	--success: #3fb27f;
+	--accent: #2a2238;
+	--ring: #b87fed;
+	--radius-panel: 1rem;
+	--radius-control: 0.75rem;
+	--radius-chip: 0.5rem;
+	--motion-duration: 400ms;
+	--motion-duration-out: 200ms;
+	--motion-stagger: 100ms;
+}
+
 html {
-  overflow-y: scroll !important;
-  padding-right: 0 !important;
+	overflow-y: scroll !important;
+	padding-right: 0 !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: var(--ink-bright);
 }
 
 .break-word {
-  word-break: break-word;
-  hyphens: auto;
+	word-break: break-word;
+	hyphens: auto;
 }
 
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-text;
+	@apply bg-gradient-text bg-clip-text text-transparent;
+}
+
+.data {
+	font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
 }

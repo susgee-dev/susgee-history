@@ -12,7 +12,7 @@ export default function Footer() {
 				</Link>
 				.
 			</p>
-			<div className="flex flex-col justify-center gap-1 p-2 text-center text-font-dark md:flex-row md:gap-2">
+			<div className="flex flex-col justify-center gap-1 p-2 text-center text-ink-faint md:flex-row md:gap-2">
 				<p>
 					&copy; {new Date().getFullYear()} <Link href="/">susgee.dev</Link>
 				</p>

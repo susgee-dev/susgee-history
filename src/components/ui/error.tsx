@@ -46,10 +46,10 @@ export default function Error({ type = 'notFound', title, message, children }: E
 				width={240}
 			/>
 			<Heading>
-				<span className="text-red-500">{error.code}</span>
+				<span className="text-destructive">{error.code}</span>
 				<span> {title || error.title}</span>
 			</Heading>
-			<p className="text-center text-2xl">{message || error.message}</p>
+			<p className="text-center text-2xl text-ink-muted">{message || error.message}</p>
 			{children && <div className="mt-6">{children}</div>}
 		</div>
 	);

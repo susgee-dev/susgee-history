@@ -38,7 +38,12 @@ export default function LogsContent({
 	};
 
 	useEffect(() => {
+		let cancelled = false;
+
 		async function loadLogsData() {
+			setError(null);
+			setIsLoading(true);
+
 			try {
 				const options = {
 					...(channel && { channel }),
@@ -50,16 +55,26 @@ export default function LogsContent({
 
 				const messages = await fetchLogsData(options);
 
-				setParsed(messages);
+				if (!cancelled) {
+					setParsed(messages);
+				}
 			} catch (err) {
-				setError('An error occurred while loading logs');
-				logger.error(err);
+				if (!cancelled) {
+					setError('An error occurred while loading logs');
+					logger.error(err);
+				}
 			} finally {
-				setIsLoading(false);
+				if (!cancelled) {
+					setIsLoading(false);
+				}
 			}
 		}
 
 		loadLogsData();
+
+		return () => {
+			cancelled = true;
+		};
 	}, [channel, url, provider, limit, reverse]);
 
 	if (error) {
@@ -84,27 +99,27 @@ export default function LogsContent({
 			</div>
 
 			{hasCustomSettings && (
-				<div className="my-4 rounded-lg border border-primary/20 bg-primary/5 p-3">
-					<div className="text-sm text-primary/80">
-						<strong>Custom Settings:</strong>
+				<div className="my-4 rounded-panel border border-line bg-surface-panel p-3">
+					<div className="text-sm text-ink-muted">
+						<strong className="text-ink-bright">Custom Settings:</strong>
 						{url && (
 							<div className="mt-1">
-								URL: <span className="font-mono text-xs">{url}</span>
+								URL: <span className="data text-xs text-ink-bright">{url}</span>
 							</div>
 						)}
 						{provider && (
 							<div className="mt-1">
-								Provider: <span className="font-mono text-xs">{provider}</span>
+								Provider: <span className="data text-xs text-ink-bright">{provider}</span>
 							</div>
 						)}
 						{limit && (
 							<div className="mt-1">
-								Limit: <span className="font-mono text-xs">{limit} messages</span>
+								Limit: <span className="data text-xs text-ink-bright">{limit} messages</span>
 							</div>
 						)}
 						{reverse && (
 							<div className="mt-1">
-								Reverse Order: <span className="font-mono text-xs">Yes</span>
+								Reverse Order: <span className="data text-xs text-ink-bright">Yes</span>
 							</div>
 						)}
 					</div>

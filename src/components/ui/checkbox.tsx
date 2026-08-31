@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import * as React from 'react';
 
+import { popIn } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 type CheckboxProps = {
@@ -31,7 +32,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
 					<input
 						ref={ref}
 						checked={checked}
-						className="hidden"
+						className="peer sr-only"
 						id={checkboxId}
 						type="checkbox"
 						onChange={handleChange}
@@ -40,32 +41,28 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
 					<label aria-label="Checkbox" className="cursor-pointer" htmlFor={checkboxId}>
 						<div
 							className={cn(
-								'flex h-6 w-6 items-center justify-center rounded-md border-2 border-primary/60 transition-all duration-300',
-								'hover:border-primary/80 hover:shadow-md',
-								checked ? 'border-primary bg-primary/20' : 'bg-transparent',
+								'relative grid size-6 place-items-center rounded-chip border transition',
+								'border-line bg-surface-raised hover:border-line-strong',
+								checked ? 'border-primary bg-primary text-white' : 'text-transparent',
 								checkboxClassName
 							)}
 						>
 							<AnimatePresence>
 								{checked && (
 									<motion.svg
-										animate={{ scale: 1, opacity: 1 }}
-										className="h-4 w-4 stroke-primary"
-										exit={{ scale: 0, opacity: 0 }}
+										animate="animate"
+										className="size-4"
+										exit="exit"
 										fill="none"
-										initial={{ scale: 0, opacity: 0 }}
-										strokeWidth="2.5"
-										transition={{ duration: 0.2 }}
+										initial="initial"
+										stroke="currentColor"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth="3"
+										variants={popIn}
 										viewBox="0 0 24 24"
 									>
-										<motion.path
-											animate={{ pathLength: 1 }}
-											d="M5 12l5 5L20 7"
-											initial={{ pathLength: 0 }}
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											transition={{ duration: 0.3 }}
-										/>
+										<path d="M5 12.5l4.5 4.5L19 8" />
 									</motion.svg>
 								)}
 							</AnimatePresence>
@@ -75,8 +72,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
 				{label && (
 					<label
 						className={cn(
-							'cursor-pointer select-none font-medium text-primary/80 transition-colors duration-300',
-							'hover:text-primary',
+							'cursor-pointer select-none text-base leading-none text-ink transition-colors',
+							'hover:text-ink-bright',
 							labelClassName
 						)}
 						htmlFor={checkboxId}

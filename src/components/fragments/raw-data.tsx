@@ -29,7 +29,7 @@ export default function RawData({ data }: RawDataProps) {
 		<>
 			<Button
 				aria-label="View raw IRC data"
-				className="relative top-[1px] mr-1 !size-3 text-sm text-muted-foreground transition-colors hover:text-primary"
+				className="relative top-[1px] mr-1 !size-3 text-sm text-ink-faint transition-colors hover:text-primary"
 				size="icon"
 				title="View raw IRC data"
 				type="button"
@@ -48,7 +48,7 @@ export default function RawData({ data }: RawDataProps) {
 					<div className="flex flex-col gap-1">
 						{data.map((item, index) => (
 							<p key={index}>
-								<span className="font-semibold text-muted-foreground">{item.key}: </span>
+								<span className="font-semibold text-ink-muted">{item.key}: </span>
 								<span>{item.value}</span>
 							</p>
 						))}

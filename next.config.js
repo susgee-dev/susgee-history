@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	agentRules: false,
 	images: {
 		remotePatterns: [
 			{ protocol: 'https', hostname: 'static-cdn.jtvnw.net' },
@@ -7,7 +8,8 @@ const nextConfig = {
 			{ protocol: 'https', hostname: 'cdn.frankerfacez.com' },
 			{ protocol: 'https', hostname: 'cdn.betterttv.net' }
 		]
-	}
+	},
+	allowedDevOrigins: ['192.168.178.100']
 };
 
 module.exports = nextConfig;

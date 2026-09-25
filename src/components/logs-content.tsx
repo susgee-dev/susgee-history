@@ -85,8 +85,26 @@ export default function LogsContent({
 
 	return (
 		<>
-			<Link href="/" onClick={handleBackToSearch}>
-				← back to search
+			<Link
+				className="touch-manipulation self-start"
+				href="/"
+				iconBefore={
+					<svg
+						aria-hidden="true"
+						className="size-4"
+						fill="none"
+						stroke="currentColor"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						strokeWidth={2}
+						viewBox="0 0 24 24"
+					>
+						<path d="M15 19l-7-7 7-7" />
+					</svg>
+				}
+				onClick={handleBackToSearch}
+			>
+				back to search
 			</Link>
 
 			<div className="flex flex-wrap items-end justify-between">

@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			className={`${font.className} ${dataFont.variable} dark scroll-pt-4 scroll-smooth`}
 			lang="en"
 		>
-			<body className="flex min-h-screen flex-col bg-gradient-bg bg-fixed text-ink">
+			<body className="flex min-h-dvh flex-col bg-gradient-bg bg-fixed text-ink">
 				<MotionProvider>
 					<main className="mx-auto w-full max-w-[45rem] flex-1 p-4">{children}</main>
 					<Footer />

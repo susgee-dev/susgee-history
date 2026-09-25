@@ -13,6 +13,19 @@ type Emote = {
 	aspectRatio: number;
 };
 
+function emotePage(provider: string, id: string) {
+	switch (provider) {
+		case '7tv':
+			return `https://7tv.app/emotes/${id}`;
+		case 'bttv':
+			return `https://betterttv.com/emotes/${id}`;
+		case 'ffz':
+			return `https://www.frankerfacez.com/emoticon/${id}`;
+		default:
+			return `https://emotes.susgee.dev/emote/${id}`;
+	}
+}
+
 export default function EmoteImage({ id, provider, src, alt, title, aspectRatio }: Emote) {
 	const [hasError, setHasError] = useState(false);
 	const [showTooltip, setShowTooltip] = useState(false);
@@ -112,7 +125,7 @@ export default function EmoteImage({ id, provider, src, alt, title, aspectRatio 
 						<span className="text-center font-medium text-ink">{title}</span>
 						<Link
 							className="text-sm"
-							href={`https://chatvau.lt/emote/${provider}/${id}`}
+							href={emotePage(provider, id)}
 							iconAfter={
 								<svg
 									height={12}

@@ -10,14 +10,18 @@ export default function HomePage() {
 	return (
 		<motion.div
 			animate="animate"
-			className="flex flex-col gap-8 pt-16"
+			className="flex flex-col gap-8 pt-10 sm:pt-20"
 			initial="initial"
 			variants={stagger}
 		>
-			<motion.div variants={fadeUp}>
+			<motion.div className="flex flex-col gap-3" variants={fadeUp}>
 				<Heading as="h1" variant="compact">
-					Twitch Channel History
+					<span className="gradient-text">Twitch</span> Channel History
 				</Heading>
+				<p className="text-ink-muted">
+					Read the recent chat of any Twitch channel, with emotes and badges. Messages come from
+					public recent-messages services, nothing is stored here.
+				</p>
 			</motion.div>
 			<motion.div variants={fadeUp}>
 				<SearchChannel />

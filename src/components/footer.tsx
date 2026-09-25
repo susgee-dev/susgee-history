@@ -1,27 +1,28 @@
-'use client';
-
 import { Link } from '@/components/ui/link';
+
+function Dot() {
+	return <span aria-hidden="true" className="hidden size-1 rounded-full bg-line-strong sm:block" />;
+}
 
 export default function Footer() {
 	return (
-		<footer>
-			<p className="text-center">
-				Ideas for improvements? Discovered a bug? Feel free to create an{' '}
+		<footer className="flex flex-col gap-2 px-4 pb-6 pt-10 text-center text-sm">
+			<p className="text-ink-muted">
+				Ideas or found a bug?{' '}
 				<Link href="https://github.com/susgee-dev/susgee-history/issues/new" target="_blank">
-					issue on our GitHub
+					Open an issue on GitHub
 				</Link>
-				.
 			</p>
-			<div className="flex flex-col justify-center gap-1 p-2 text-center text-ink-faint md:flex-row md:gap-2">
+			<div className="flex flex-col items-center justify-center gap-1 text-ink-faint sm:flex-row sm:gap-3">
 				<p>
-					&copy; {new Date().getFullYear()} <Link href="/">susgee.dev</Link>
+					&copy; {new Date().getFullYear()} <Link href="https://susgee.dev">susgee.dev</Link>
 				</p>
-				<span className="hidden md:flex"> • </span>
-				<p>not affiliated with twitch</p>
-				<span className="hidden md:flex"> • </span>
+				<Dot />
+				<p>not affiliated with Twitch</p>
+				<Dot />
 				<p>
-					Made with 🤍 by
-					<Link className="pl-1" href="https://twitch.tv/maersux" rel="noreferrer" target="_blank">
+					made by{' '}
+					<Link href="https://twitch.tv/maersux" rel="noreferrer" target="_blank">
 						maersux
 					</Link>
 				</p>

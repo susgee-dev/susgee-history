@@ -4,6 +4,7 @@ import { type MouseEvent, useEffect, useState } from 'react';
 
 import { fetchLogsData } from '@/app/actions';
 import MessageList from '@/components/message-list';
+import SearchChannel from '@/components/search-channel';
 import Error from '@/components/ui/error';
 import { Heading } from '@/components/ui/heading';
 import { Link } from '@/components/ui/link';
@@ -60,7 +61,7 @@ export default function LogsContent({
 				}
 			} catch (err) {
 				if (!cancelled) {
-					setError('An error occurred while loading logs');
+					setError('Check the channel name, or pick another source under advanced options.');
 					logger.error(err);
 				}
 			} finally {
@@ -76,10 +77,6 @@ export default function LogsContent({
 			cancelled = true;
 		};
 	}, [channel, url, provider, limit, reverse]);
-
-	if (error) {
-		return <Error message={error} title="Error Loading Logs" type="notFound" />;
-	}
 
 	const hasCustomSettings = provider || limit || reverse || url;
 
@@ -144,7 +141,12 @@ export default function LogsContent({
 				</div>
 			)}
 
-			{isLoading ? <LoadingSpinner /> : <MessageList messages={parsed} />}
+			{error && (
+				<Error headingAs="h2" message={error} title="Couldn't load this chat" type="notFound">
+					<SearchChannel />
+				</Error>
+			)}
+			{!error && (isLoading ? <LoadingSpinner /> : <MessageList messages={parsed} />)}
 		</>
 	);
 }

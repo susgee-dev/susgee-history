@@ -68,6 +68,7 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 			className={cn(
 				'w-full break-words rounded-chip px-2 py-1 text-lg/6 hover:bg-accent',
 				message.isFirstMessage ? 'bg-success/20' : '',
+				message.deleted && 'opacity-50 grayscale',
 				isHighlighted ? 'animate-highlight' : ''
 			)}
 			id={message.id}
@@ -96,7 +97,9 @@ export default function PrivMessage({ message }: ChatMessageProps) {
 				{message.addColon && ':'}{' '}
 			</span>
 
-			<MessageText isAction={message.isAction} message={message} />
+			<span className={cn(message.deleted && 'line-through')}>
+				<MessageText isAction={message.isAction} message={message} />
+			</span>
 		</div>
 	);
 }

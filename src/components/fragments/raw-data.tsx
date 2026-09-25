@@ -45,11 +45,11 @@ export default function RawData({ data }: RawDataProps) {
 
 			{isPopupOpen && (
 				<Popup action={handleClosePopup} isOpen={isPopupOpen} title="Raw IRC Data">
-					<div className="flex flex-col gap-1">
+					<div className="flex flex-col gap-1 text-sm">
 						{data.map((item, index) => (
-							<p key={index}>
+							<p key={index} className="break-all">
 								<span className="font-semibold text-ink-muted">{item.key}: </span>
-								<span>{item.value}</span>
+								<span className="data text-ink-bright">{item.value}</span>
 							</p>
 						))}
 					</div>

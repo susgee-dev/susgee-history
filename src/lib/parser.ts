@@ -18,6 +18,20 @@ import {
 class Parser {
 	private readonly fallbackColor = '#808080';
 
+	private readonly ignoredCommands = new Set([
+		'CLEARMSG',
+		'ROOMSTATE',
+		'USERSTATE',
+		'GLOBALUSERSTATE',
+		'NOTICE',
+		'HOSTTARGET',
+		'JOIN',
+		'PART',
+		'PING',
+		'PONG',
+		'RECONNECT'
+	]);
+
 	private readonly handlers: Record<string, (parsed: ParsedIRC) => ParsedMessage | null> = {
 		PRIVMSG: this.handlePrivMsg.bind(this),
 		USERNOTICE: this.handleUserNotice.bind(this),
@@ -27,12 +41,12 @@ class Parser {
 	public process(rawMessage: string, cosmetics: Cosmetics): ParsedMessage | null {
 		const parsed = this.parseRaw(rawMessage);
 
-		if (!parsed) return null;
+		if (!parsed || this.ignoredCommands.has(parsed.cmd)) return null;
 
 		const handler = this.handlers[parsed.cmd];
 
 		if (!handler) {
-			logger.warn(`unhandled message type: ${rawMessage}`);
+			logger.warn(`unhandled message type: ${parsed.cmd}`);
 
 			return null;
 		}
@@ -44,6 +58,21 @@ class Parser {
 
 			return null;
 		}
+	}
+
+	public deletedMessageIds(rawMessages: string[]): Set<string> {
+		const ids = new Set<string>();
+
+		for (const rawMessage of rawMessages) {
+			const parsed = this.parseRaw(rawMessage);
+			const targetId = parsed?.tags.get('target-msg-id');
+
+			if (parsed?.cmd === 'CLEARMSG' && targetId) {
+				ids.add(targetId);
+			}
+		}
+
+		return ids;
 	}
 
 	private safeDecode(value: string): string {
@@ -157,6 +186,7 @@ class Parser {
 			badges: this.parseBadges(tags.get('badges') || '', tags.get('badge-info') || '', cosmetics),
 			emotes: this.parseEmotes(tags.get('emotes') || ''),
 			isFirstMessage: tags.get('first-msg') === '1',
+			deleted: tags.get('rm-deleted') === '1',
 			rawIRC: parsed ? this.createIrcData(parsed.prefix, parsed.cmd, args, tagsRecord) : undefined
 		};
 	}

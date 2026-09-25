@@ -57,6 +57,7 @@ export interface BaseMessage {
 	badges: TwitchBadge[];
 	emotes: TwitchIRCEmote[];
 	isFirstMessage: boolean;
+	deleted?: boolean;
 	text: ProcessedWord[];
 	rawIRC?: RawIRCData[];
 }

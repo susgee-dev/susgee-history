@@ -129,10 +129,13 @@ export async function fetchLogsData(options: LogsOptions): Promise<ParsedMessage
 		};
 	}
 
+	const deletedIds = parser.deletedMessageIds(messages ?? []);
+
 	let processedMessages =
 		messages
 			?.map((msg: string) => parser.process(msg, cosmetics))
-			?.filter((msg): msg is ParsedMessage => !!msg) || [];
+			?.filter((msg): msg is ParsedMessage => !!msg)
+			.map((msg) => (deletedIds.has(msg.id) ? { ...msg, deleted: true } : msg)) || [];
 
 	const shouldReverse =
 		options.reverse === undefined ? provider.defaultReverseOrder : !options.reverse;

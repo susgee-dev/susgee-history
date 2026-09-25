@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
@@ -43,12 +44,12 @@ export default function Popup({ isOpen, action, title, children, className = '' 
 
 	if (!isOpen) return null;
 
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-canvas/80">
+	return createPortal(
+		<div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-canvas/80 p-4 backdrop-blur-sm">
 			<div
 				ref={popupRef}
 				className={cn(
-					'max-h-[80vh] w-[90vw] max-w-2xl overflow-auto rounded-panel p-4 shadow-lg',
+					'max-h-[80vh] w-full max-w-2xl overflow-auto rounded-panel p-4 text-base shadow-lg',
 					'border border-line bg-surface-panel',
 					className
 				)}
@@ -74,6 +75,7 @@ export default function Popup({ isOpen, action, title, children, className = '' 
 				</div>
 				{children}
 			</div>
-		</div>
+		</div>,
+		document.body
 	);
 }

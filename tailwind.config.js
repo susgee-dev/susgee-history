@@ -8,8 +8,8 @@ const config = {
 		extend: {
 			keyframes: {
 				highlight: {
-					'0%': { backgroundColor: 'rgba(184, 127, 237, 0.6)' },
-					'50%': { backgroundColor: 'rgba(184, 127, 237, 0.3)' },
+					'0%': { backgroundColor: 'color-mix(in srgb, var(--primary) 60%, transparent)' },
+					'50%': { backgroundColor: 'color-mix(in srgb, var(--primary) 30%, transparent)' },
 					'100%': { backgroundColor: 'transparent' }
 				}
 			},
@@ -17,68 +17,68 @@ const config = {
 				highlight: 'highlight 2s ease-in-out'
 			},
 			backgroundImage: {
-				'gradient-text': 'linear-gradient(145deg, #b87fed 0%, #601e9e 100%)',
-				'gradient-bg': 'linear-gradient(145deg, #06040c 0%, #100a1c 100%)'
+				'gradient-text': 'var(--gradient-text)',
+				'gradient-bg': 'var(--gradient-bg)'
 			},
 			borderRadius: {
-				panel: '1rem',
-				control: '0.75rem',
-				chip: '0.5rem'
+				panel: 'var(--radius-panel)',
+				control: 'var(--radius-control)',
+				chip: 'var(--radius-chip)'
 			},
 			borderColor: {
 				line: {
-					DEFAULT: '#2d2540',
-					soft: '#221b30',
-					strong: '#3d3453'
+					DEFAULT: 'var(--line)',
+					soft: 'var(--line-soft)',
+					strong: 'var(--line-strong)'
 				}
 			},
 			colors: {
 				ink: {
-					DEFAULT: '#cfcfcf',
-					bright: '#f2eff7',
-					muted: '#9a949f',
-					faint: '#6f6a75'
+					DEFAULT: 'var(--ink)',
+					bright: 'var(--ink-bright)',
+					muted: 'var(--ink-muted)',
+					faint: 'var(--ink-faint)'
 				},
 				surface: {
-					canvas: '#0b0714',
-					overlay: '#0d0916',
-					inset: '#130f1d',
-					panel: '#1a1426',
-					raised: '#241d33'
+					canvas: 'var(--surface-canvas)',
+					overlay: 'var(--surface-overlay)',
+					inset: 'var(--surface-inset)',
+					panel: 'var(--surface-panel)',
+					raised: 'var(--surface-raised)'
 				},
 				line: {
-					DEFAULT: '#2d2540',
-					soft: '#221b30',
-					strong: '#3d3453'
+					DEFAULT: 'var(--line)',
+					soft: 'var(--line-soft)',
+					strong: 'var(--line-strong)'
 				},
 				primary: {
-					DEFAULT: '#b87fed',
-					60: '#78549d',
-					30: '#493462',
-					dark: '#601e9e'
+					DEFAULT: 'var(--primary)',
+					60: 'var(--primary-60)',
+					30: 'var(--primary-30)',
+					dark: 'var(--primary-dark)'
 				},
 				twitch: {
-					DEFAULT: '#6441a5',
-					dark: '#5a3a94'
+					DEFAULT: 'var(--twitch)',
+					dark: 'var(--twitch-dark)'
 				},
 				danger: {
-					DEFAULT: '#e0555b',
-					surface: '#3a1f26',
-					border: '#6b2f38'
+					DEFAULT: 'var(--danger)',
+					surface: 'var(--danger-surface)',
+					border: 'var(--danger-border)'
 				},
 				destructive: {
-					DEFAULT: '#c73a44',
-					foreground: '#ffffff'
+					DEFAULT: 'var(--destructive)',
+					foreground: 'var(--destructive-foreground)'
 				},
-				success: '#3fb27f',
-				accent: '#2a2238',
-				ring: '#b87fed',
+				success: 'var(--success)',
+				accent: 'var(--accent)',
+				ring: 'var(--ring)',
 				font: {
-					DEFAULT: '#cfcfcf',
-					dark: '#7a7a7a'
+					DEFAULT: 'var(--ink)',
+					dark: 'var(--ink-muted)'
 				},
 				muted: {
-					foreground: '#9a949f'
+					foreground: 'var(--ink-muted)'
 				}
 			},
 			fontFamily: {

@@ -5,6 +5,7 @@ import React from 'react';
 
 import Footer from '@/components/footer';
 import MotionProvider from '@/components/motion-provider';
+import { getSeasonalTheme, SEASONAL_BOOT_SCRIPT } from '@/lib/seasonal-theme';
 
 import '@/styles/globals.css';
 
@@ -56,16 +57,27 @@ const dataFont = JetBrains_Mono({
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+	const seasonalTheme = getSeasonalTheme();
+
 	return (
 		<html
 			suppressHydrationWarning
 			className={`${font.className} ${dataFont.variable} dark scroll-pt-4 scroll-smooth`}
+			data-theme={seasonalTheme ?? undefined}
 			lang="en"
 		>
-			<body className="flex min-h-dvh flex-col bg-gradient-bg bg-fixed text-ink">
+			<head>
+				<link rel="stylesheet" href="https://susgee.dev/susgee-theme.css" />
+				<script dangerouslySetInnerHTML={{ __html: SEASONAL_BOOT_SCRIPT }} />
+			</head>
+			<body className="relative flex min-h-dvh flex-col bg-gradient-bg bg-fixed text-ink">
 				<MotionProvider>
-					<main className="mx-auto w-full max-w-[45rem] flex-1 p-4">{children}</main>
-					<Footer />
+					<main className="relative z-10 mx-auto w-full max-w-[45rem] flex-1 p-4">
+						{children}
+					</main>
+					<div className="relative z-10">
+						<Footer />
+					</div>
 				</MotionProvider>
 				{process.env.TRACKING_ID && (
 					<Script

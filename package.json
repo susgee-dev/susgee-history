@@ -9,7 +9,7 @@
 		"lint": "eslint --fix"
 	},
 	"dependencies": {
-		"@react-aria/ssr": "3.9.8",
+		"@react-aria/ssr": "3.10.1",
 		"@react-aria/visually-hidden": "3.9.1",
 		"clsx": "2.1.1",
 		"dotenv": "^16.5.0",

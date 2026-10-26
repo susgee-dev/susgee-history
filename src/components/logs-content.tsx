@@ -10,6 +10,7 @@ import { Heading } from '@/components/ui/heading';
 import { Link } from '@/components/ui/link';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 import logger from '@/lib/logger';
+import { saveRecentChannel } from '@/lib/recent-channels';
 import { ParsedMessage } from '@/types/message';
 
 type LogsContentProps = {
@@ -58,6 +59,10 @@ export default function LogsContent({
 
 				if (!cancelled) {
 					setParsed(messages);
+
+					if (channel) {
+						saveRecentChannel(channel.toLowerCase());
+					}
 				}
 			} catch (err) {
 				if (!cancelled) {

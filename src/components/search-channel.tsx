@@ -9,7 +9,7 @@ import RecentChannels from '@/components/recent-channels';
 import { Input } from '@/components/ui/input';
 import { heightReveal } from '@/lib/motion';
 import provider from '@/lib/providers';
-import { loadRecentChannels, saveRecentChannel, writeRecentChannels } from '@/lib/recent-channels';
+import { loadRecentChannels, writeRecentChannels } from '@/lib/recent-channels';
 import { cn } from '@/lib/utils';
 
 function toChannelName(input: string) {
@@ -38,7 +38,6 @@ export default function SearchChannel() {
 
 	const openChannel = (channel: string, params = new URLSearchParams()) => {
 		params.set('c', channel);
-		setRecentChannels(saveRecentChannel(channel));
 		router.push(`/?${params}`, { scroll: false });
 	};
 

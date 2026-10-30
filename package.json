@@ -9,7 +9,7 @@
 		"lint": "eslint --fix"
 	},
 	"dependencies": {
-		"@react-aria/ssr": "3.9.8",
+		"@react-aria/ssr": "3.10.1",
 		"@react-aria/visually-hidden": "3.9.1",
 		"clsx": "2.1.1",
 		"dotenv": "^16.5.0",
@@ -18,19 +18,19 @@
 		"intl-messageformat": "10.7.16",
 		"next": "^16.4.2",
 		"next-themes": "0.4.6",
-		"react": "^19.2.8",
-		"react-dom": "^19.2.8"
+		"react": "^19.3.1",
+		"react-dom": "^19.3.1"
 	},
 	"devDependencies": {
 		"@eslint/compat": "1.2.8",
 		"@eslint/eslintrc": "3.3.1",
 		"@eslint/js": "9.25.1",
 		"@next/eslint-plugin-next": "^16.4.2",
-		"@react-types/shared": "3.29.0",
+		"@react-types/shared": "3.37.0",
 		"@types/humanize-duration": "^3.27.4",
 		"@types/node": "22.15.3",
 		"@types/react": "^19.2.18",
-		"@types/react-dom": "^19.2.5",
+		"@types/react-dom": "^19.3.0",
 		"@typescript-eslint/eslint-plugin": "8.71.1",
 		"@typescript-eslint/parser": "8.71.1",
 		"autoprefixer": "10.5.4",
@@ -62,6 +62,7 @@
 		"postcss-selector-parser": "7.1.6",
 		"sharp": "0.35.5",
 		"source-map-js": "1.2.2",
-		"@humanfs/node": "0.16.8"
+		"@humanfs/node": "0.16.8",
+		"zod": "^4.6.7"
 	}
 }
